@@ -1,5 +1,6 @@
-import {Request, RequestHandler, Response, NextFunction} from 'express'
-import {RequestMethod} from '../request'
+import {RequestMethod} from '../http'
+
+export type XFunction = (...args: any[]) => any
 
 /**
  *
@@ -17,15 +18,15 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
 
       /**
        *
-       * @param {Request} req
-       * @param {Response} res
-       * @param {MextFunction} next
+       * @param {XFunction} req
+       * @param {XFunction} res
+       * @param {XFunction} next
        */
-      const handler: RequestHandler = (req: Request, res: Response, next?: NextFunction) => {
+      const handler: XFunction = (req: XFunction, res: XFunction, next?: XFunction) => {
         // TODO: find a way to inject callable's arguments
         if (res) {
           // console.log('ala bala', req, res)
-          res.send(callable.apply(null))
+          // res.send(callable.apply(null))
         }
         return next
       }

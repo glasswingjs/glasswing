@@ -1,11 +1,12 @@
 import {resolve, Singleton} from '../di'
-import {RequestHandler} from 'express' // TODO: Must be express independent
-import {RequestMethod} from '../request'
+import {RequestMethod} from '../http'
+
+export type XFunction = (...args: any[]) => any
 
 export interface ControllerRoute {
   method: RequestMethod
   paths: string[]
-  handler: RequestHandler
+  handler: XFunction
 }
 
 @Singleton()
@@ -23,10 +24,10 @@ export class ControllerRouteRegistry {
    * Register a route within the application.
    * @param {RequestMethod} method
    * @param {string | string[]} path
-   * @param {RequestHandler} handler
+   * @param {XFunction} handler
    * @returns {void}
    */
-  public registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void {
+  public registerRoute(method: RequestMethod, path: string | string[], handler: XFunction): void {
     const paths: string[] = Array.isArray(path) ? path : [path]
 
     const matches: ControllerRoute[] = this.registry.filter((route: ControllerRoute) => {
@@ -37,9 +38,9 @@ export class ControllerRouteRegistry {
     }
 
     this.registry.push({
+      handler,
       method,
       paths,
-      handler,
     })
   }
 
@@ -57,7 +58,7 @@ const routeRegistry: ControllerRouteRegistry = resolve(ControllerRouteRegistry)
 
 export interface Controller {
   clearRoutes(): void
-  registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void
+  registerRoute(method: RequestMethod, path: string | string[], handler: XFunction): void
   registeredRoutes(): ControllerRoute[]
 }
 
@@ -70,10 +71,10 @@ export class AbstractController implements Controller {
    * Register a route within the application.
    * @param {RequestMethod} method
    * @param {string | string[]} path
-   * @param {RequestHandler} handler
+   * @param {XFunction} handler
    * @returns {void}
    */
-  public registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void {
+  public registerRoute(method: RequestMethod, path: string | string[], handler: XFunction): void {
     routeRegistry.registerRoute(method, path, handler)
   }
 

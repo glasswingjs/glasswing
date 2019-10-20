@@ -1,5 +1,5 @@
 export * from './controller'
 export * from './di'
-export * from './request'
+export * from './http'
 export * from './route'
 export * from './application'

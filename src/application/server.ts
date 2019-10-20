@@ -1,19 +1,26 @@
-
 import {createServer as createHttpServer, Server as HttpServer} from 'http'
+import {createSecureServer as createHttps2Server, createServer as createHttp2Server, Http2Server} from 'http2'
 import {createServer as createHttpsServer, Server as HttpsServer} from 'https'
-import {createServer as createHttp2Server, createSecureServer as createHttps2Server, Http2Server} from 'http2'
+import {container} from 'tsyringe'
+
+import {Inject} from '../di'
 
 export type HttpOrHttpsServer = HttpServer | HttpsServer | Http2Server
 
-import {container} from 'tsyringe'
-import { Inject } from '../di'
-import { rejects } from 'assert'
+export type XFunction = (...args: any[]) => any
 
 // import {Config} from '../config'
 // import {Controller} from '../controller'
 // import {Inject} from '../di'
-// import {NextFunction} from './server'
+// import {NextXFunction} from './server'
 
+/**
+ * @see https://wanago.io/2019/03/25/node-js-typescript-7-creating-a-server-and-receiving-requests/
+ * @see https://nodejs.org/api/http.html#http_event_request
+ * @see https://nodejs.org/api/https.html#https_server_listen
+ * @see https://nodejs.org/api/http2.html
+ * @see https://nodejs.org/api/net.html
+ */
 
 export const registerHttpServer = () =>
   container.register('Server', {
@@ -49,7 +56,6 @@ export interface IApplication {
 }
 
 export class Application implements IApplication {
-
   protected port: number = 3000
   protected host?: string
   protected retries: number = 1
@@ -57,7 +63,7 @@ export class Application implements IApplication {
 
   constructor(
     // @Inject('Config') protected config: Config
-    @Inject('Server') protected server: HttpOrHttpsServer
+    @Inject('Server') protected server: HttpOrHttpsServer,
   ) {}
 
   /**
@@ -66,11 +72,31 @@ export class Application implements IApplication {
    * @param {string} host
    * @returns {Promise<void>}
    */
-  async start(port: number = 3000, host?: string): Promise<void> {
+  public async start(port: number = 3000, host?: string): Promise<void> {
     this.retries = 1
     this.port = 3000
     this.host = host
-    this.tryStart()
+    await this.tryStart()
+
+    // @link https://nodejs.org/api/http.html#http_event_clienterror
+    // this.server.on('clientError', (err, socket) => {
+    //   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+    // });
+  }
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
+  public async stop(): Promise<void> {
+    return new Promise((resolve: XFunction, reject: XFunction) => {
+      this.server.close((err?: Error | undefined) => {
+        if (err) {
+          return reject(err)
+        }
+        resolve()
+      })
+    })
   }
 
   /**
@@ -91,40 +117,24 @@ export class Application implements IApplication {
           reject(err)
         } else {
           // TODO: Add fail log
-          console.log(`Server failed starting on port: ${this.port}. Port is busy.`)
+          console.log(`Server failed starting on port: ${this.port}. Port is busy.`) // tslint:disable-line no-console
           if (this.retries++ < this.retriesMax) {
             // TODO: Add retry log
             this.port += 1
-            console.log(`Retrying with port: ${this.port}.`)
+            console.log(`Retrying with port: ${this.port}.`) // tslint:disable-line no-console
             setTimeout(() => resolve(this.tryStart()), 500)
           } else {
             // TODO: Add fail log
-            console.error(`Max retries exceeded.`)
+            console.error(`Max retries exceeded.`) // tslint:disable-line no-console
             reject(err)
           }
         }
       })
     })
   }
-
-  /**
-   *
-   * @returns {Promise<void>}
-   */
-  async stop(): Promise<void> {
-    return new Promise((resolve: Function, reject: Function) => {
-      this.server.close((err?: Error|undefined) => {
-        if (err) {
-          return reject(err)
-        }
-        resolve()
-      })
-    })
-  }
-
 }
 
-// export interface NextFunction {
+// export interface NextXFunction {
 //   // tslint:disable-next-line callable-types (In ts2.1 it thinks the type alias has no call signatures)
 //   (err?: any): void
 // }
