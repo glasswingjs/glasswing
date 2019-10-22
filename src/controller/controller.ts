@@ -1,12 +1,10 @@
 import {resolve, Singleton} from '../di'
-import {RequestMethod} from '../http'
-
-export type XFunction = (...args: any[]) => any
+import {RequestHandler, RequestMethod} from '../http'
 
 export interface ControllerRoute {
   method: RequestMethod
   paths: string[]
-  handler: XFunction
+  handler: RequestHandler
 }
 
 @Singleton()
@@ -24,10 +22,10 @@ export class ControllerRouteRegistry {
    * Register a route within the application.
    * @param {RequestMethod} method
    * @param {string | string[]} path
-   * @param {XFunction} handler
+   * @param {RequestHandler} handler
    * @returns {void}
    */
-  public registerRoute(method: RequestMethod, path: string | string[], handler: XFunction): void {
+  public registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void {
     const paths: string[] = Array.isArray(path) ? path : [path]
 
     const matches: ControllerRoute[] = this.registry.filter((route: ControllerRoute) => {
@@ -58,7 +56,7 @@ const routeRegistry: ControllerRouteRegistry = resolve(ControllerRouteRegistry)
 
 export interface Controller {
   clearRoutes(): void
-  registerRoute(method: RequestMethod, path: string | string[], handler: XFunction): void
+  registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void
   registeredRoutes(): ControllerRoute[]
 }
 
@@ -71,10 +69,10 @@ export class AbstractController implements Controller {
    * Register a route within the application.
    * @param {RequestMethod} method
    * @param {string | string[]} path
-   * @param {XFunction} handler
+   * @param {RequestHandler} handler
    * @returns {void}
    */
-  public registerRoute(method: RequestMethod, path: string | string[], handler: XFunction): void {
+  public registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void {
     routeRegistry.registerRoute(method, path, handler)
   }
 

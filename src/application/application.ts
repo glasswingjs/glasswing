@@ -1,13 +1,9 @@
-import {createServer as createHttpServer, Server as HttpServer} from 'http'
-import {createSecureServer as createHttps2Server, createServer as createHttp2Server, Http2Server} from 'http2'
-import {createServer as createHttpsServer, Server as HttpsServer} from 'https'
-import {container} from 'tsyringe'
+import Router from 'router'
 
 import {Inject} from '../di'
+import {HttpOrHttpsServer, HttpOrHttpsServerFactory} from '../http'
 
-export type HttpOrHttpsServer = HttpServer | HttpsServer | Http2Server
-
-export type XFunction = (...args: any[]) => any
+// export type XFunction = (...args: any[]) => any
 
 // import {Config} from '../config'
 // import {Controller} from '../controller'
@@ -21,26 +17,6 @@ export type XFunction = (...args: any[]) => any
  * @see https://nodejs.org/api/http2.html
  * @see https://nodejs.org/api/net.html
  */
-
-export const registerHttpServer = () =>
-  container.register('Server', {
-    useFactory: () => createHttpServer(),
-  })
-
-export const registerHttpsServer = () =>
-  container.register('Server', {
-    useFactory: () => createHttpsServer(),
-  })
-
-export const registerHttp2Server = () =>
-  container.register('Server', {
-    useFactory: () => createHttp2Server(),
-  })
-
-export const registerHttps2Server = () =>
-  container.register('Server', {
-    useFactory: () => createHttps2Server(),
-  })
 
 export interface HttpServerListenError extends Error {
   code?: string
@@ -60,10 +36,12 @@ export class Application implements IApplication {
   protected host?: string
   protected retries: number = 1
   protected retriesMax: number = 10
+  protected server?: HttpOrHttpsServer
 
   constructor(
     // @Inject('Config') protected config: Config
-    @Inject('Server') protected server: HttpOrHttpsServer,
+    @Inject('ServerFactory') protected serverFactory: HttpOrHttpsServerFactory,
+    @Inject('Router') protected router: Router,
   ) {}
 
   /**
@@ -76,6 +54,8 @@ export class Application implements IApplication {
     this.retries = 1
     this.port = 3000
     this.host = host
+    // this.mapRoutes()
+    // this.server = this.serverFactory.create()
     await this.tryStart()
 
     // @link https://nodejs.org/api/http.html#http_event_clienterror
@@ -89,7 +69,7 @@ export class Application implements IApplication {
    * @returns {Promise<void>}
    */
   public async stop(): Promise<void> {
-    return new Promise((resolve: XFunction, reject: XFunction) => {
+    return new Promise((resolve, reject) => {
       this.server.close((err?: Error | undefined) => {
         if (err) {
           return reject(err)

@@ -1,4 +1,8 @@
-import {RequestMethod} from '../http'
+/**
+ * @link https://nehalist.io/routing-with-typescript-decorators/#routedecorator
+ */
+
+import {NextFunction, Request, RequestHandler, RequestMethod, Response} from '../http'
 
 export type XFunction = (...args: any[]) => any
 
@@ -18,11 +22,11 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
 
       /**
        *
-       * @param {XFunction} req
-       * @param {XFunction} res
-       * @param {XFunction} next
+       * @param {Request} req
+       * @param {Response} res
+       * @param {NextFunction} next
        */
-      const handler: XFunction = (req: XFunction, res: XFunction, next?: XFunction) => {
+      const handler: RequestHandler = (req: Request, res: Response, next?: NextFunction) => {
         // TODO: find a way to inject callable's arguments
         if (res) {
           // console.log('ala bala', req, res)
