@@ -1,1 +1,2 @@
-export * from './route-mapping-express'
+export * from './route-mapping'
+export * from './route-registry'

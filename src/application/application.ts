@@ -1,14 +1,6 @@
-import Router from 'router'
-
 import {Inject} from '../di'
-import {HttpOrHttpsServer, HttpOrHttpsServerFactory} from '../http'
-
-// export type XFunction = (...args: any[]) => any
-
-// import {Config} from '../config'
-// import {Controller} from '../controller'
-// import {Inject} from '../di'
-// import {NextXFunction} from './server'
+import {Router} from '../router'
+import {HttpOrHttpsServer, HttpOrHttpsServerFactory} from './server-factory'
 
 /**
  * @see https://wanago.io/2019/03/25/node-js-typescript-7-creating-a-server-and-receiving-requests/
@@ -41,7 +33,7 @@ export class Application implements IApplication {
   constructor(
     // @Inject('Config') protected config: Config
     @Inject('ServerFactory') protected serverFactory: HttpOrHttpsServerFactory,
-    @Inject('Router') protected router: Router,
+    @Inject('Router') protected router: Router
   ) {}
 
   /**
@@ -55,7 +47,7 @@ export class Application implements IApplication {
     this.port = 3000
     this.host = host
     // this.mapRoutes()
-    // this.server = this.serverFactory.create()
+    this.server = this.serverFactory.create(this.router)
     await this.tryStart()
 
     // @link https://nodejs.org/api/http.html#http_event_clienterror
@@ -70,6 +62,9 @@ export class Application implements IApplication {
    */
   public async stop(): Promise<void> {
     return new Promise((resolve, reject) => {
+      if (!this.server) {
+        throw new Error('There is no server to stop. Please use .start() method first.')
+      }
       this.server.close((err?: Error | undefined) => {
         if (err) {
           return reject(err)
@@ -86,13 +81,13 @@ export class Application implements IApplication {
   protected tryStart(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.host) {
-        this.server.listen(this.port, this.host)
+        this.server!.listen(this.port, this.host)
       } else {
-        this.server.listen(this.port)
+        this.server!.listen(this.port)
       }
 
-      this.server.on('error', (err: HttpServerListenError) => {
-        this.server.close()
+      this.server!.on('error', (err: HttpServerListenError) => {
+        this.server!.close()
         if (err.code !== 'EADDRINUSE') {
           reject(err)
         } else {

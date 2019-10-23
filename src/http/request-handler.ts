@@ -6,4 +6,4 @@ export interface NextFunction {
   (err?: any): void
 }
 
-export type RequestHandler = (req: Request, res: Response, next: NextFunction) => void
+export type RequestHandler = (req: Request, res: Response, next?: NextFunction) => void

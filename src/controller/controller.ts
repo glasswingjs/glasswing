@@ -1,63 +1,13 @@
 import {resolve, Singleton} from '../di'
 import {RequestHandler, RequestMethod} from '../http'
+import {Route, RouteRegistry} from '../route'
 
-export interface ControllerRoute {
-  method: RequestMethod
-  paths: string[]
-  handler: RequestHandler
-}
-
-@Singleton()
-export class ControllerRouteRegistry {
-  private registry: ControllerRoute[] = []
-
-  /**
-   * Clear the regiutry. Use only when Router is destroyed.
-   */
-  public clear() {
-    this.registry = []
-  }
-
-  /**
-   * Register a route within the application.
-   * @param {RequestMethod} method
-   * @param {string | string[]} path
-   * @param {RequestHandler} handler
-   * @returns {void}
-   */
-  public registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void {
-    const paths: string[] = Array.isArray(path) ? path : [path]
-
-    const matches: ControllerRoute[] = this.registry.filter((route: ControllerRoute) => {
-      return route.method === method && (route.paths as []).filter(p => -1 !== path.indexOf(p)).length
-    })
-    if (matches.length) {
-      throw new Error(`Route '${path}' already exists.`)
-    }
-
-    this.registry.push({
-      handler,
-      method,
-      paths,
-    })
-  }
-
-  /**
-   * Obtain the list of routes stored in the registry
-   * Getter
-   * @returns {ControllerRoute[]}
-   */
-  get routes(): ControllerRoute[] {
-    return this.registry
-  }
-}
-
-const routeRegistry: ControllerRouteRegistry = resolve(ControllerRouteRegistry)
+const routeRegistry: RouteRegistry = resolve(RouteRegistry)
 
 export interface Controller {
   clearRoutes(): void
-  registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void
-  registeredRoutes(): ControllerRoute[]
+  registerRoute(method: RequestMethod, path: string, handler: RequestHandler): void
+  registeredRoutes(): Route[]
 }
 
 export class AbstractController implements Controller {
@@ -72,19 +22,23 @@ export class AbstractController implements Controller {
    * @param {RequestHandler} handler
    * @returns {void}
    */
-  public registerRoute(method: RequestMethod, path: string | string[], handler: RequestHandler): void {
-    routeRegistry.registerRoute(method, path, handler)
+  public registerRoute(method: RequestMethod, path: string, handler: RequestHandler): void {
+    routeRegistry.registerRoute(path, method, handler)
   }
 
   /**
    * Obtain the list of routes defined within controller
-   * @returns {ControllerRoute[]}
+   * @returns {Route[]}
    */
-  public registeredRoutes(): ControllerRoute[] {
+  public registeredRoutes(): Route[] {
     return routeRegistry.routes
   }
 
-  public getRouteRegistry(): ControllerRouteRegistry {
+  /**
+   *
+   * @returns RouteRegistry
+   */
+  public getRouteRegistry(): RouteRegistry {
     return routeRegistry
   }
 }
