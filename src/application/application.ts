@@ -33,7 +33,7 @@ export class Application implements IApplication {
   constructor(
     // @Inject('Config') protected config: Config
     @Inject('ServerFactory') protected serverFactory: HttpOrHttpsServerFactory,
-    @Inject('Router') protected router: Router
+    @Inject('Router') protected router: Router,
   ) {}
 
   /**

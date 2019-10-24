@@ -1,4 +1,4 @@
-import {Singleton} from '../di'
+import {Injectable, Singleton} from '../di'
 import {RequestHandler, RequestMethod} from '../http'
 
 export interface Route {
@@ -10,7 +10,6 @@ export interface Route {
 export class RouteRegistryArgumentException extends Error {}
 
 export class RouteRegistryRouteExistsException extends Error {}
-
 
 @Singleton()
 export class RouteRegistry {
@@ -35,7 +34,9 @@ export class RouteRegistry {
     let xroute: Route
     if (typeof route === 'string') {
       if (!handler) {
-        throw new RouteRegistryArgumentException('For `registryRoute(string, RequestMethod, RequestHandler)` form, `handler` parameter si mandatory.')
+        throw new RouteRegistryArgumentException(
+          'For `registryRoute(string, RequestMethod, RequestHandler)` form, `handler` parameter si mandatory.',
+        )
       }
       xroute = {
         handler,
@@ -46,9 +47,13 @@ export class RouteRegistry {
       xroute = route
     }
 
-    const match: Route | undefined = this.registry.find((r: Route) => r.path === xroute.path && r.method === xroute.method)
+    const match: Route | undefined = this.registry.find(
+      (r: Route) => r.path === xroute.path && r.method === xroute.method,
+    )
     if (match) {
-      throw new RouteRegistryRouteExistsException(`A route for path \'${xroute.path}\' with method \'${xroute.method}\' was already added.`)
+      throw new RouteRegistryRouteExistsException(
+        `A route for path \'${xroute.path}\' with method \'${xroute.method}\' was already added.`,
+      )
     }
 
     this.registry.push(xroute)
@@ -71,7 +76,7 @@ export class RouteRegistry {
    */
   public unregisterRoutes(path: string, method?: RequestMethod): void {
     this.registry = this.registry
-      .map((r: Route) => r.path === path && (r.method === method || method === undefined) ? null : r)
+      .map((r: Route) => (r.path === path && (r.method === method || method === undefined) ? null : r))
       .filter((r: Route | null) => r !== null) as Route[]
   }
 }

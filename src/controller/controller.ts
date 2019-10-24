@@ -1,29 +1,26 @@
-import {resolve, Singleton} from '../di'
+import {container} from 'tsyringe'
 import {RequestHandler, RequestMethod} from '../http'
 import {Route, RouteRegistry} from '../route'
+import {Inject} from '../di'
 
-const routeRegistry: RouteRegistry = resolve(RouteRegistry)
+export class AbstractController {
+  // protected routeRegistry: RouteRegistry
 
-export interface Controller {
-  clearRoutes(): void
-  registerRoute(method: RequestMethod, path: string, handler: RequestHandler): void
-  registeredRoutes(): Route[]
-}
+  constructor(@Inject(RouteRegistry) protected routeRegistry: RouteRegistry) {}
 
-export class AbstractController implements Controller {
   public clearRoutes() {
-    routeRegistry.clear()
+    this.routeRegistry.clear()
   }
 
   /**
    * Register a route within the application.
+   * @param {Route | string} route
    * @param {RequestMethod} method
-   * @param {string | string[]} path
    * @param {RequestHandler} handler
    * @returns {void}
    */
-  public registerRoute(method: RequestMethod, path: string, handler: RequestHandler): void {
-    routeRegistry.registerRoute(path, method, handler)
+  public registerRoute(route: Route | string, method?: RequestMethod, handler?: RequestHandler): void {
+    // this.routeRegistry.registerRoute(route, method, handler)
   }
 
   /**
@@ -31,7 +28,8 @@ export class AbstractController implements Controller {
    * @returns {Route[]}
    */
   public registeredRoutes(): Route[] {
-    return routeRegistry.routes
+    return []
+    // return this.routeRegistry.routes
   }
 
   /**
@@ -39,6 +37,6 @@ export class AbstractController implements Controller {
    * @returns RouteRegistry
    */
   public getRouteRegistry(): RouteRegistry {
-    return routeRegistry
+    return this.routeRegistry
   }
 }

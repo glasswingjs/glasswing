@@ -1,7 +1,7 @@
-import {AbstractController, Controller} from '../controller'
+import {AbstractController} from '../controller'
 import {All, Delete, Get, Head, Options, Patch, Post, Put} from '../route'
 
-export class TestController extends AbstractController implements Controller {
+export class TestController extends AbstractController {
   @All('/no-args-all')
   public noArgsAll(): string {
     return 'noArgsAll'

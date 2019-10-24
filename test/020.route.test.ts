@@ -3,7 +3,6 @@ import {container} from 'tsyringe'
 
 import {expect} from 'chai'
 
-
 import {Request, RequestMethod, Response, Route, RouteRegistry} from '../src'
 
 describe('lib/crontroller => RouteRegistry', () => {
@@ -42,25 +41,29 @@ describe('lib/crontroller => RouteRegistry', () => {
   it('RouteRegistry::registerRoute(get, /test, handler) should register properly', () => {
     expect(addRouteAsString).to.not.throw()
 
-    const addedRoute: Route | undefined = routeRegistry.routes.find(r => r.path === routeAsString.path && r.method === routeAsString.method)
+    const addedRoute: Route | undefined = routeRegistry.routes.find(
+      r => r.path === routeAsString.path && r.method === routeAsString.method,
+    )
     expect(addedRoute).to.not.be.a('null')
     expect(addedRoute).to.not.be.a('undefined')
   })
 
   it('RouteRegistry::registerRoute(get, /test, handler) if ran for seccond time, should throw error', () => {
-    expect(addRouteAsString).to.throw('A route for path \'/path-as-string\' with method \'get\' was already added.')
+    expect(addRouteAsString).to.throw("A route for path '/path-as-string' with method 'get' was already added.")
   })
 
   it('RouteRegistry::registerRoute(route)', () => {
     expect(addRouteAsObject).to.not.throw()
 
-    const addedRoute: Route | undefined = routeRegistry.routes.find(r => r.path === routeAsObject.path && r.method === routeAsObject.method)
+    const addedRoute: Route | undefined = routeRegistry.routes.find(
+      r => r.path === routeAsObject.path && r.method === routeAsObject.method,
+    )
     expect(addedRoute).to.not.be.a('null')
     expect(addedRoute).to.not.be.a('undefined')
   })
 
   it('RouteRegistry::registerRoute(route) if ran for seccond time, should throw error', () => {
-    expect(addRouteAsObject).to.throw('A route for path \'/path-as-object\' with method \'get\' was already added.')
+    expect(addRouteAsObject).to.throw("A route for path '/path-as-object' with method 'get' was already added.")
   })
 
   it('RouteRegistry::routes getter to return a valid array', () => {
@@ -70,7 +73,9 @@ describe('lib/crontroller => RouteRegistry', () => {
   it('RouteRegistry::unregisterRoutes(/path-to-string, post) to not remove route (with get method)', () => {
     routeRegistry.unregisterRoutes(routeAsString.path, RequestMethod.POST)
 
-    const addedRoute: Route | undefined = routeRegistry.routes.find(r => r.path === routeAsString.path && r.method === routeAsString.method)
+    const addedRoute: Route | undefined = routeRegistry.routes.find(
+      r => r.path === routeAsString.path && r.method === routeAsString.method,
+    )
     expect(addedRoute).to.not.be.a('null')
     expect(addedRoute).to.not.be.a('undefined')
   })
@@ -78,7 +83,9 @@ describe('lib/crontroller => RouteRegistry', () => {
   it('RouteRegistry::unregisterRoutes(/path-to-string, get) to remove route (with get method)', () => {
     routeRegistry.unregisterRoutes(routeAsString.path, routeAsString.method)
 
-    const addedRoute: Route | undefined = routeRegistry.routes.find(r => r.path === routeAsString.path && r.method === routeAsString.method)
+    const addedRoute: Route | undefined = routeRegistry.routes.find(
+      r => r.path === routeAsString.path && r.method === routeAsString.method,
+    )
     console.log(addedRoute)
     expect(addedRoute).to.be.a('undefined')
   })
@@ -97,5 +104,4 @@ describe('lib/crontroller => RouteRegistry', () => {
     expect(routeRegistry.routes).to.be.an('array')
     expect(routeRegistry.routes.length).to.equal(0)
   })
-
 })
