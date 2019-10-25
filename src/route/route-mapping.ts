@@ -1,10 +1,14 @@
+import {container} from 'tsyringe'
+import {NextFunction, Request, RequestHandler, RequestMethod, Response} from '../http'
+import {RouteRegistry} from './route-registry'
+
 /**
  * @link https://nehalist.io/routing-with-typescript-decorators/#routedecorator
  */
 
-import {NextFunction, Request, RequestHandler, RequestMethod, Response} from '../http'
-
 export type XFunction = (...args: any[]) => any
+
+const routeRegistry = container.resolve(RouteRegistry)
 
 /**
  *
@@ -17,8 +21,9 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
    */
   const decorator = (path?: string | string[]): MethodDecorator => {
     return function(target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
-      const controller = target
-      const callable = descriptor.value
+      const routeRegistry: RouteRegistry = Reflect.hasMetadata('routeRegistry', target.constructor)
+        ? (Reflect.getMetadata('routeRegistry', target.constructor) as RouteRegistry)
+        : new RouteRegistry()
 
       /**
        *
@@ -29,13 +34,17 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
       const handler: RequestHandler = (req: Request, res: Response, next?: NextFunction) => {
         // TODO: find a way to inject callable's arguments
         if (res) {
-          // console.log('ala bala', req, res)
-          // res.send(callable.apply(null))
+          console.log('ala bala', req, res)
+          res.end(descriptor.value.apply(null))
         }
         return next
       }
 
-      controller.registerRoute(method, path || '/', handler)
+      path = Array.isArray(path) ? path : [path || '/']
+
+      path.forEach(p => routeRegistry.registerRoute(p, method, handler))
+
+      Reflect.defineMetadata('routeRegistry', routeRegistry, target)
 
       return Object.assign(descriptor, {
         value: handler,

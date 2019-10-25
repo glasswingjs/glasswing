@@ -86,7 +86,6 @@ describe('lib/crontroller => RouteRegistry', () => {
     const addedRoute: Route | undefined = routeRegistry.routes.find(
       r => r.path === routeAsString.path && r.method === routeAsString.method,
     )
-    console.log(addedRoute)
     expect(addedRoute).to.be.a('undefined')
   })
 

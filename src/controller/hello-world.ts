@@ -1,13 +1,8 @@
-import {Get, RouteRegistry} from '../route'
-import {Inject, Singleton} from '../di'
-import {AbstractController} from './controller'
+import {Get} from '../route'
+import {Controller} from './controller'
 
-@Singleton()
-export class HelloWorldController extends AbstractController {
-  constructor(@Inject(RouteRegistry) protected routeRegistry: RouteRegistry) {
-    super(routeRegistry)
-  }
-
+@Controller()
+export class HelloWorldController {
   @Get('/hello-world')
   public helloWorld(): string {
     return 'Hello World!'

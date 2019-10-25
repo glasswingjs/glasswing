@@ -18,17 +18,32 @@ export class RouteRegistry {
   /**
    * Clear the regiutry. Use only when Router is destroyed.
    */
-  public clear() {
+  public clear(): void {
     this.registry = []
   }
 
   /**
    * Register a route within the application.
-   * @param {string} path
-   * @param {RequestMethod} method
-   * @param {RequestHandler} handler
+   * @param path
+   * @param method
+   * @param handler
    * @throws {RouteRegistryException}
    * @returns {void}
+   * @example
+   *    const controller = new MyController()
+   *    controller.registerRoute('/users', RequestMethod.GET, (req: Request, res: Response) => {
+   *      ...
+   *    })
+   * @example
+   *    const controller = new MyController()
+   *    const route: Route = {
+   *      path: '/users',
+   *      method: RequestMethod.GET,
+   *      handler: (req: Request, res: Response) => {
+   *        ...
+   *      }
+   *    }
+   *    controller.registerRoute(route)
    */
   public registerRoute(route: string | Route, method?: RequestMethod, handler?: RequestHandler): void {
     let xroute: Route
@@ -70,8 +85,8 @@ export class RouteRegistry {
 
   /**
    * Unregister routes
-   * @param {string} path
-   * @param {RequestMethod} method
+   * @param path
+   * @param method
    * @returns {void}
    */
   public unregisterRoutes(path: string, method?: RequestMethod): void {
