@@ -3,13 +3,11 @@ import {Singleton} from '../di'
 import {RouteRegistry} from '../route'
 
 export class AbstractController {
-
   constructor() {
     if (!Reflect.hasMetadata('routeRegistry', this)) {
       Reflect.defineMetadata('routeRegistry', new RouteRegistry(), this)
     }
   }
-
 }
 
 /**
@@ -18,7 +16,7 @@ export class AbstractController {
  * @returns {ClassDecorator}
  */
 export function Controller(): ClassDecorator {
-  return function(target: any): void {
+  return (target: any): void => {
     if (!Reflect.hasMetadata('routeRegistry', target)) {
       Reflect.defineMetadata('routeRegistry', new RouteRegistry(), target)
     }

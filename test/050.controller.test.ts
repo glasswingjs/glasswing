@@ -41,7 +41,9 @@ describe('lib/controller => AbstractController', () => {
 
   it('Controller routeRegistry will contain /my-hello-world route', () => {
     const routeRegistry: RouteRegistry = Reflect.getMetadata('routeRegistry', controller) as RouteRegistry
-    const route: Route = routeRegistry.routes.find(r => r.method === RequestMethod.GET && r.path === '/my-hello-world') as Route
+    const route: Route = routeRegistry.routes.find(
+      r => r.method === RequestMethod.GET && r.path === '/my-hello-world',
+    ) as Route
     expect(route).to.be.an('object')
   })
 })
@@ -75,7 +77,9 @@ describe('lib/controller => @Controller', () => {
 
   it('Controller routeRegistry will contain /hello-world route', () => {
     const routeRegistry: RouteRegistry = Reflect.getMetadata('routeRegistry', controller) as RouteRegistry
-    const route: Route = routeRegistry.routes.find(r => r.method === RequestMethod.GET && r.path === '/hello-world') as Route
+    const route: Route = routeRegistry.routes.find(
+      r => r.method === RequestMethod.GET && r.path === '/hello-world',
+    ) as Route
     expect(route).to.be.an('object')
   })
 })

@@ -1,5 +1,4 @@
-import {container} from 'tsyringe'
-import {NextFunction, Request, RequestHandler, RequestMethod, Response} from '../http'
+import {Request, RequestHandler, RequestMethod, Response} from '../http'
 import {RouteRegistry} from './route-registry'
 
 /**
@@ -7,8 +6,6 @@ import {RouteRegistry} from './route-registry'
  */
 
 export type XFunction = (...args: any[]) => any
-
-const routeRegistry = container.resolve(RouteRegistry)
 
 /**
  *
@@ -20,7 +17,7 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
    * @param {string|string[]} path
    */
   const decorator = (path?: string | string[]): MethodDecorator => {
-    return function(target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
+    return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
       const routeRegistry: RouteRegistry = Reflect.hasMetadata('routeRegistry', target.constructor)
         ? (Reflect.getMetadata('routeRegistry', target.constructor) as RouteRegistry)
         : new RouteRegistry()
@@ -31,13 +28,12 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
        * @param {Response} res
        * @param {NextFunction} next
        */
-      const handler: RequestHandler = (req: Request, res: Response, next?: NextFunction) => {
+      const handler: RequestHandler = (req: Request, res: Response) => {
         // TODO: find a way to inject callable's arguments
         if (res) {
-          console.log('ala bala', req, res)
+          // console.log('ala bala', req, res)
           res.end(descriptor.value.apply(null))
         }
-        return next
       }
 
       path = Array.isArray(path) ? path : [path || '/']

@@ -1,15 +1,14 @@
-import finalhandler from 'finalhandler'
-import {createServer as createHttpServer, Server as HttpServer} from 'http'
-import Router from 'router'
+import {createServer as createHttpServer} from 'http'
 import {container} from 'tsyringe'
 
 import {Request, Response} from '../../http'
-import {HttpOrHttpsServer} from './index.d'
+import {RouterCallable} from '../../router'
+import {HttpOrHttpsServer} from './_types'
 
 export class HttpServerFactory {
-  create(router: Router): HttpOrHttpsServer {
+  public create(router: RouterCallable): HttpOrHttpsServer {
     return createHttpServer((req: Request, res: Response) => {
-      router(req, res, finalhandler(req, res))
+      router(req, res)
     })
   }
 }

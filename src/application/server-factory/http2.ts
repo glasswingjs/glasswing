@@ -1,16 +1,15 @@
-import finalhandler from 'finalhandler'
-import {createServer as createHttp2Server, Http2Server} from 'http2'
-import Router from 'router'
+import {createServer as createHttp2Server} from 'http2'
 import {container} from 'tsyringe'
 
 import {Request, Response} from '../../http'
+import {RouterCallable} from '../../router'
+import {HttpOrHttpsServer} from './_types'
 import {HttpServerFactory} from './http'
-import {HttpOrHttpsServer} from './index.d'
 
 export class Http2ServerFactory extends HttpServerFactory {
-  create(router: Router): HttpOrHttpsServer {
+  public create(router: RouterCallable): HttpOrHttpsServer {
     return createHttp2Server((req: Request, res: Response) => {
-      router(req, res, finalhandler(req, res))
+      router(req, res)
     })
   }
 }
