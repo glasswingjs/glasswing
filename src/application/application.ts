@@ -2,14 +2,6 @@
 // import {Router} from '../router'
 // import {HttpOrHttpsServer, HttpOrHttpsServerFactory} from './server-factory'
 
-// /**
-//  * @see https://wanago.io/2019/03/25/node-js-typescript-7-creating-a-server-and-receiving-requests/
-//  * @see https://nodejs.org/api/http.html#http_event_request
-//  * @see https://nodejs.org/api/https.html#https_server_listen
-//  * @see https://nodejs.org/api/http2.html
-//  * @see https://nodejs.org/api/net.html
-//  */
-
 // export interface HttpServerListenError extends Error {
 //   code?: string
 // }
