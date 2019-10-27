@@ -17,3 +17,7 @@ export type HttpOrHttpsServerOptions = HttpServerOptions | HttpsServerOptions | 
 export type HttpOrHttpsServer = HttpServer | HttpsServer | Http2Server | Http2SecureServer
 
 export type HttpOrHttpsServerFactory = HttpServerFactory | HttpsServerFactory | Http2ServerFactory | Https2ServerFactory
+
+export interface HttpServerListenError extends Error {
+  code: string
+}
