@@ -7,11 +7,16 @@ export type Request = IncomingMessage | Http2ServerRequest
 
 export type RequestHandler = (req: Request, res: Response) => void
 
+export type ParameterSource = 'request' | 'response' | 'request+response' | 'router'
+export type ParameterMapperCallable = (entity: any) => any
+
+export type RequestBodyDecoder = (val: string) => any
+
 /**
  * List of HTTP headers, as described on MDN Documentation
  * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
  */
-export enum Header {
+export enum RequestHeader {
   ACCEPT = 'Accept',
   ACCEPT_CH = 'Accept-CH',
   ACCEPT_CH_LIFETIME = 'Accept-CH-Lifetime',
