@@ -1,7 +1,7 @@
 import {ParsedUrlQuery} from 'querystring'
 import {parse} from 'url'
 
-import {ParameterMapperCallable, ParameterSource, Request, RequestBodyDecoder, RequestHeader, Response} from './_types'
+import {ParameterMapperCallable, ParameterSource, Request, RequestAndResponse, RequestBodyDecoder, RequestHeader, Response} from './_types'
 
 /**
  *
@@ -82,8 +82,12 @@ export const Cookie = (key?: string, value?: any): ParameterDecorator => {
 /** TODO: */
 export const Header = (key?: RequestHeader | string, value?: any): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
-    appendParameterMapper(target, methodKey, parameterIndex, (entity: object) => {
-      // TODO:
+    appendParameterMapper(target, methodKey, parameterIndex, (entity: RequestAndResponse) => {
+      if (value === undefined) {
+        return key ? entity.request.headers[key] : entity.request.headers
+      }
+      entity.response.setHeader(key, value)
+      return value
     })
   }
 }
@@ -108,9 +112,8 @@ export const Ip = (target: any, methodKey: string | symbol, parameterIndex: numb
  */
 export const Param = (key?: string): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
-    appendParameterMapper(target, methodKey, parameterIndex, (req: Request): any => {
-      // TODO: This one involved the router
-      return null
+    appendParameterMapper(target, methodKey, parameterIndex, (params: object): any => {
+      return key ? params[key] : params
     })
   }
 }

@@ -5,6 +5,11 @@ export type Response = ServerResponse | Http2ServerResponse
 
 export type Request = IncomingMessage | Http2ServerRequest
 
+export interface RequestAndResponse {
+  request: Request,
+  response: Response
+}
+
 export type RequestHandler = (req: Request, res: Response) => void
 
 export type ParameterSource = 'request' | 'response' | 'request+response' | 'router'
