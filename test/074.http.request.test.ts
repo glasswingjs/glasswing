@@ -1,14 +1,40 @@
 import 'reflect-metadata'
+import httpMocks from 'node-mocks-http'
 
 // import YAML from 'yaml'
+
+import {Controller, Req, Request, Get, Res, Response} from '../src'
 
 const testObject: object = {
   test: 1,
 }
 
+@Controller()
+class TestController {
+
+  // @Get('/has-req-argument')
+  // hasReqArgument(@Req() req: Request) {
+  //   return req
+  // }
+
+  @Get('/has-res-argument')
+  hasResArgument(@Res res: Response) {
+    return res
+  }
+
+}
+
 describe('lib/http/request => *', () => {
   describe('Body(key:? string, decoder?: RequestBodyDecoder) => ', () => {
-    it('@Body() => Should return return an object (even if body is empty)', () => {})
+    let controller: TestController
+
+    beforeEach(() => {
+      controller = new TestController()
+    })
+
+    it('@Body() => Should return return an object (even if body is empty)', () => {
+      // console.log(controller.hasReqArgument)
+    })
 
     it('@Body(`test`) => Should return value for key `test`', () => {})
 

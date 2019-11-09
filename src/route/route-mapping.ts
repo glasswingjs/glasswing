@@ -32,7 +32,7 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
         // TODO: find a way to inject callable's arguments
         if (res) {
           // console.log('ala bala', req, res)
-          res.end(descriptor.value.apply(null))
+          // res.end(descriptor.value.apply(null))
         }
       }
 
@@ -49,6 +49,8 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
   }
   return decorator
 }
+
+
 
 export const All = createRouteMappingDecorator(RequestMethod.ALL)
 

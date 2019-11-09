@@ -51,7 +51,7 @@ const appendParameterMapper = (
     source,
   }
   Reflect.defineMetadata(methodArgumentsDescriptor, metadata, target)
-  // console.log(metadata)
+  console.log(metadata)
 }
 
 /**
