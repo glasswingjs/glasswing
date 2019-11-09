@@ -6,7 +6,7 @@ export type Response = ServerResponse | Http2ServerResponse
 export type Request = IncomingMessage | Http2ServerRequest
 
 export interface RequestAndResponse {
-  request: Request,
+  request: Request
   response: Response
 }
 

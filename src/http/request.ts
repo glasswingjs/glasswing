@@ -1,7 +1,16 @@
 import {ParsedUrlQuery} from 'querystring'
+import SetCookieParser from 'set-cookie-parser'
 import {parse} from 'url'
 
-import {ParameterMapperCallable, ParameterSource, Request, RequestAndResponse, RequestBodyDecoder, RequestHeader, Response} from './_types'
+import {
+  ParameterMapperCallable,
+  ParameterSource,
+  Request,
+  RequestAndResponse,
+  RequestBodyDecoder,
+  RequestHeader,
+  Response,
+} from './_types'
 
 /**
  *
@@ -71,22 +80,43 @@ export const Cookie = (key?: string, value?: any): ParameterDecorator => {
       target,
       methodKey,
       parameterIndex,
-      (entity: object) => {
-        // TODO:
+      (entity: RequestAndResponse) => {
+        if (value === undefined) {
+          const cookiesString: string = (entity.request.headers || {}).cookie || ''
+          // const cookiesArray: any[] = cookiesString
+          //   .split(';')
+          //   .map((cookie: string) => {
+          //     var parts: string[] = cookie.split('=');
+          //     return { [(parts.shift()||'').trim()]: decodeURI(parts.join('=')), }
+          //   })
+          // const cookies: any = Object.assign({}, ...cookiesArray)
+          const cookies: any = SetCookieParser.parse(cookiesString)
+          return key ? cookies[key] : cookies
+        }
+        entity.response.writeHead(200, {
+          [RequestHeader.SET_COOKIE]: `${key}=${value}`,
+          [RequestHeader.CONTENT_TYPE]: 'text/plain',
+        })
       },
       'request+response',
     )
   }
 }
 
-/** TODO: */
+/**
+ * Header(key?: RequestHeader | string, value?: any)
+ * If key is not mentioned or `null`, will return the entire headers object.
+ * If key is mentioned and not null, will return a certain property of the headers object, defined by the key's
+ * value.
+ * If value is mentioned, it will set the specified value to the key.
+ */
 export const Header = (key?: RequestHeader | string, value?: any): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
     appendParameterMapper(target, methodKey, parameterIndex, (entity: RequestAndResponse) => {
       if (value === undefined) {
         return key ? entity.request.headers[key] : entity.request.headers
       }
-      entity.response.setHeader(key, value)
+      entity.response.setHeader(key as string, value)
       return value
     })
   }
@@ -113,7 +143,7 @@ export const Ip = (target: any, methodKey: string | symbol, parameterIndex: numb
 export const Param = (key?: string): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
     appendParameterMapper(target, methodKey, parameterIndex, (params: object): any => {
-      return key ? params[key] : params
+      return key ? (params as any)[key] : params
     })
   }
 }
