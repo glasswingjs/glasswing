@@ -55,7 +55,7 @@ const appendParameterMapper = (
 }
 
 /**
- * @Body(key:? string, decoder?: RequestBodyDecoder)
+ * Body(key:? string, decoder?: RequestBodyDecoder)
  * If key is not mentioned or `null`, will return the entire decoded body.
  * If key is mentioned and not null, will return a certain property of the body, defined by the key's value.
  */
@@ -73,7 +73,15 @@ export const Body = (key?: string, decoder: RequestBodyDecoder = JSON.parse): Pa
   }
 }
 
-/** TODO: */
+/**
+ * Cookie(key?: string, value?: any)
+ * If key is not mentioned or `null`, will return the entire cookies object.
+ * If key is mentioned and not null, will return a certain property of the cookies object, defined by the key's
+ * value.
+ * If value is mentioned, it will set a new cookie based on key and value.
+ *
+ * TODO: Should add expires and domain parameters.
+ */
 export const Cookie = (key?: string, value?: any): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
     appendParameterMapper(
@@ -93,6 +101,9 @@ export const Cookie = (key?: string, value?: any): ParameterDecorator => {
           const cookies: any = SetCookieParser.parse(cookiesString)
           return key ? cookies[key] : cookies
         }
+        if (!key) {
+          throw new Error() // TODO:
+        }
         entity.response.writeHead(200, {
           [RequestHeader.SET_COOKIE]: `${key}=${value}`,
           [RequestHeader.CONTENT_TYPE]: 'text/plain',
@@ -104,19 +115,22 @@ export const Cookie = (key?: string, value?: any): ParameterDecorator => {
 }
 
 /**
- * Header(key?: RequestHeader | string, value?: any)
+ * Header(key?: string, value?: any)
  * If key is not mentioned or `null`, will return the entire headers object.
  * If key is mentioned and not null, will return a certain property of the headers object, defined by the key's
  * value.
  * If value is mentioned, it will set the specified value to the key.
  */
-export const Header = (key?: RequestHeader | string, value?: any): ParameterDecorator => {
+export const Header = (key?: string, value?: any): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
     appendParameterMapper(target, methodKey, parameterIndex, (entity: RequestAndResponse) => {
       if (value === undefined) {
         return key ? entity.request.headers[key] : entity.request.headers
       }
-      entity.response.setHeader(key as string, value)
+      if (!key) {
+        throw new Error() // TODO:
+      }
+      entity.response.setHeader(key, value)
       return value
     })
   }
