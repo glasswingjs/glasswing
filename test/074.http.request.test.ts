@@ -3,33 +3,31 @@ import httpMocks from 'node-mocks-http'
 
 // import YAML from 'yaml'
 
-import {Controller, Req, Request, Get, Res, Response} from '../src'
+// import {Controller, Req, Request, Get, Res, Response} from '../src'
 
-const testObject: object = {
-  test: 1,
-}
+// const testObject: object = {
+//   test: 1,
+// }
 
-@Controller()
-class TestController {
+// @Controller()
+// class TestController {
+//   // @Get('/has-req-argument')
+//   // hasReqArgument(@Req() req: Request) {
+//   //   return req
+//   // }
 
-  // @Get('/has-req-argument')
-  // hasReqArgument(@Req() req: Request) {
-  //   return req
-  // }
-
-  @Get('/has-res-argument')
-  hasResArgument(@Res res: Response) {
-    return res
-  }
-
-}
+//   @Get('/has-res-argument')
+//   hasResArgument(@Res() res: Response) {
+//     return res
+//   }
+// }
 
 describe('lib/http/request => *', () => {
   describe('Body(key:? string, decoder?: RequestBodyDecoder) => ', () => {
-    let controller: TestController
+    // let controller: TestController
 
-    beforeEach(() => {
-      controller = new TestController()
+    before(() => {
+      // controller = new TestController()
     })
 
     it('@Body() => Should return return an object (even if body is empty)', () => {

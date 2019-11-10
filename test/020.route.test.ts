@@ -5,7 +5,7 @@ import {expect} from 'chai'
 
 import {Request, RequestMethod, Response, Route, RouteRegistry} from '../src'
 
-describe('lib/crontroller => RouteRegistry', () => {
+describe('lib/route => RouteRegistry', () => {
   let routeRegistry: RouteRegistry
 
   const routeAsString: Route = {

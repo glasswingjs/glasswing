@@ -12,9 +12,6 @@ export interface RequestAndResponse {
 
 export type RequestHandler = (req: Request, res: Response) => void
 
-export type ParameterSource = 'request' | 'response' | 'request+response' | 'router'
-export type ParameterMapperCallable = (entity: any) => any
-
 export type RequestBodyDecoder = (val: string) => any
 
 /**

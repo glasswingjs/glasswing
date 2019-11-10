@@ -1,5 +1,5 @@
-import {AbstractController} from '../controller'
-import {All, Delete, Get, Head, Options, Patch, Post, Put} from '../route'
+import {AbstractController} from './controller'
+import {All, Delete, Get, Head, Options, Patch, Post, Put} from './decorator'
 
 export class TestController extends AbstractController {
   @All('/no-args-all')

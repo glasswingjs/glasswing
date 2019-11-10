@@ -1,5 +1,4 @@
-import {Get} from '../route'
-import {Controller} from './controller'
+import {Controller, Get} from './decorator'
 
 @Controller()
 export class HelloWorldController {

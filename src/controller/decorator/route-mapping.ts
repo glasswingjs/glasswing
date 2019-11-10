@@ -1,11 +1,15 @@
-import {Request, RequestHandler, RequestMethod, Response} from '../http'
-import {RouteRegistry} from './route-registry'
+import {Request, RequestHandler, RequestMethod, Response} from '../../http'
+import {RouteRegistry} from '../../route'
 
 /**
  * @link https://nehalist.io/routing-with-typescript-decorators/#routedecorator
  */
 
 export type XFunction = (...args: any[]) => any
+
+const mapHandlerArguments = (req: Request, res: Response, params: any[], metadata: any[]): any[] => {
+  return []
+}
 
 /**
  *
@@ -22,18 +26,20 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
         ? (Reflect.getMetadata('routeRegistry', target.constructor) as RouteRegistry)
         : new RouteRegistry()
 
+      // const metadata = Reflect.getMetadata(methodArgumentsDescriptor(propertyKey), target) as any[]
+      // console.log(methodArgumentsDescriptor(propertyKey), metadata, target)
+
       /**
        *
        * @param {Request} req
        * @param {Response} res
        * @param {NextFunction} next
        */
-      const handler: RequestHandler = (req: Request, res: Response) => {
-        // TODO: find a way to inject callable's arguments
-        if (res) {
-          // console.log('ala bala', req, res)
-          // res.end(descriptor.value.apply(null))
-        }
+      const handler: RequestHandler = (req: Request, res: Response /*, params: any[]*/) => {
+        // const args: any[] = mapHandlerArguments(req, res, params, Reflect.getMetadata(
+        //   methodArgumentsDescriptor(propertyKey),
+        //   target,
+        // ) as any[])
       }
 
       path = Array.isArray(path) ? path : [path || '/']
@@ -49,8 +55,6 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
   }
   return decorator
 }
-
-
 
 export const All = createRouteMappingDecorator(RequestMethod.ALL)
 
