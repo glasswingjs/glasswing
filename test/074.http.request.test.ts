@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import httpMocks from 'node-mocks-http'
+// import httpMocks from 'node-mocks-http'
 
 // import YAML from 'yaml'
 
@@ -9,79 +9,66 @@ import httpMocks from 'node-mocks-http'
 //   test: 1,
 // }
 
-// @Controller()
-// class TestController {
-//   // @Get('/has-req-argument')
-//   // hasReqArgument(@Req() req: Request) {
-//   //   return req
-//   // }
+// describe('lib/controller/decorator/argument-injector => *', () => {
+//   describe('Body(key:? string, decoder?: RequestBodyDecoder) => ', () => {
+//     let controller: TestController
 
-//   @Get('/has-res-argument')
-//   hasResArgument(@Res() res: Response) {
-//     return res
-//   }
-// }
+//     before(() => {
+//       controller = new TestController()
+//     })
 
-describe('lib/http/request => *', () => {
-  describe('Body(key:? string, decoder?: RequestBodyDecoder) => ', () => {
-    // let controller: TestController
+//     it('@Body() => Should return return an object (even if body is empty)', () => {
+//       // console.log(controller.hasReqArgument)
+//     })
 
-    before(() => {
-      // controller = new TestController()
-    })
+//     it('@Body(`test`) => Should return value for key `test`', () => {})
 
-    it('@Body() => Should return return an object (even if body is empty)', () => {
-      // console.log(controller.hasReqArgument)
-    })
+//     it('@Body(undefined, YAML.parse) => Should return return an object (even if body is empty)', () => {})
 
-    it('@Body(`test`) => Should return value for key `test`', () => {})
+//     it('@Body(`test`, YAML.parse) => Should return value for key `test`', () => {})
+//   })
 
-    it('@Body(undefined, YAML.parse) => Should return return an object (even if body is empty)', () => {})
+//   describe('Cookie(key:? string, value?: string) => ', () => {
+//     it('@Cookie() => Should return return an object (even if cookies is empty)', () => {})
 
-    it('@Body(`test`, YAML.parse) => Should return value for key `test`', () => {})
-  })
+//     it('@Cookie(`test`) => Should return value for key `test`', () => {})
 
-  describe('Cookie(key:? string, value?: string) => ', () => {
-    it('@Cookie() => Should return return an object (even if cookies is empty)', () => {})
+//     it('@Cookie(`test`, `test`) => Should set value `test` for key `test`', () => {})
 
-    it('@Cookie(`test`) => Should return value for key `test`', () => {})
+//     it('@Cookie(undefined, `test`) => Should throw an error', () => {})
+//   })
 
-    it('@Cookie(`test`, `test`) => Should set value `test` for key `test`', () => {})
+//   describe('Header(key:? string, value?: string) => ', () => {
+//     it('@Header() => Should return return an object (even if headers is empty)', () => {})
 
-    it('@Cookie(undefined, `test`) => Should throw an error', () => {})
-  })
+//     it('@Header(`test`) => Should return value for key `test`', () => {})
 
-  describe('Header(key:? string, value?: string) => ', () => {
-    it('@Header() => Should return return an object (even if headers is empty)', () => {})
+//     it('@Header(`test`, `test`) => Should set value `test` for key `test`', () => {})
 
-    it('@Header(`test`) => Should return value for key `test`', () => {})
+//     it('@Header(undefined, `test`) => Should throw an error', () => {})
+//   })
 
-    it('@Header(`test`, `test`) => Should set value `test` for key `test`', () => {})
+//   describe('Ip() => ', () => {
+//     it('@Header() => Should return return an string', () => {})
+//   })
 
-    it('@Header(undefined, `test`) => Should throw an error', () => {})
-  })
+//   describe('Param(key:? string) => ', () => {
+//     it('@Param() => Should return return an object (even if params is empty)', () => {})
 
-  describe('Ip() => ', () => {
-    it('@Header() => Should return return an string', () => {})
-  })
+//     it('@Param(`test`) => Should return value for key `test`', () => {})
+//   })
 
-  describe('Param(key:? string) => ', () => {
-    it('@Param() => Should return return an object (even if params is empty)', () => {})
+//   describe('Query(key:? string) => ', () => {
+//     it('@Query() => Should return return an object (even if query is empty)', () => {})
 
-    it('@Param(`test`) => Should return value for key `test`', () => {})
-  })
+//     it('@Query(`test`) => Should return value for key `test`', () => {})
+//   })
 
-  describe('Query(key:? string) => ', () => {
-    it('@Query() => Should return return an object (even if query is empty)', () => {})
+//   describe('Req() => ', () => {
+//     it('@Req() => Should return return an object', () => {})
+//   })
 
-    it('@Query(`test`) => Should return value for key `test`', () => {})
-  })
-
-  describe('Req() => ', () => {
-    it('@Req() => Should return return an object', () => {})
-  })
-
-  describe('Res() => ', () => {
-    it('@Res() => Should return return an object', () => {})
-  })
-})
+//   describe('Res() => ', () => {
+//     it('@Res() => Should return return an object', () => {})
+//   })
+// })

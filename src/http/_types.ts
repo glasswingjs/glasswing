@@ -1,9 +1,9 @@
 import {IncomingMessage, RequestListener as HttpRequestHandler, ServerResponse} from 'http'
 import {Http2ServerRequest, Http2ServerResponse} from 'http2'
 
-export type Response = ServerResponse | Http2ServerResponse
-
 export type Request = IncomingMessage | Http2ServerRequest
+
+export type Response = ServerResponse | Http2ServerResponse
 
 export interface RequestAndResponse {
   request: Request
