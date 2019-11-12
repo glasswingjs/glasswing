@@ -1,15 +1,25 @@
 import 'reflect-metadata'
 import {expect} from 'chai'
-import {container} from 'tsyringe'
 import {IncomingMessage} from 'http'
+import {container} from 'tsyringe'
+import YAML from 'yaml'
 
 import {MockRequest} from './mock'
 import {Body, methodArgumentsDescriptor, Request} from '../src'
 
+const bodyObject = {
+  test: 'testValue',
+  test2: 'testValue2',
+}
+
 class TestController {
   hasBodyAsArgument(@Body() body: any) {}
 
+  hasYamlBodyAsArgument(@Body(undefined, YAML.parse) body: any) {}
+
   hasBodyKeyAsArgument(@Body('test') body: any) {}
+
+  hasYamlBodyKeyAsArgument(@Body('test', YAML.parse) body: any) {}
 }
 
 const hmd = (key: string, target: any) => Reflect.hasMetadata(methodArgumentsDescriptor(key), target)
@@ -17,13 +27,10 @@ const hmd = (key: string, target: any) => Reflect.hasMetadata(methodArgumentsDes
 const gmd = (key: string, target: any) => Reflect.getMetadata(methodArgumentsDescriptor(key), target)
 
 const req = (): Request => {
-  return new MockRequest(
-    {},
-    JSON.stringify({
-      test: 'testValue',
-    }),
-  )
+  return new MockRequest({}, JSON.stringify(bodyObject))
 }
+
+const reqYaml = (): Request => new MockRequest({}, YAML.stringify(bodyObject))
 
 describe('lib/controller/decorator/argument-injector => *', () => {
   describe('Body(key:? string, decoder?: RequestBodyDecoder) => ', () => {
@@ -41,14 +48,56 @@ describe('lib/controller/decorator/argument-injector => *', () => {
       expect(metadata[0].source).to.equal('request')
     })
 
-    it('@Body() =>  Should add a @Body argument descriptor for the entire body object', () => {
-      expect(hmd('hasBodyAsArgument', controller)).to.be.true
+    it('@Body() =>  Should add a @Body argument containing the entire body object', done => {
       const metadata = gmd('hasBodyAsArgument', controller)
-      metadata[0].callable(req()).then((data: object) => console.log(data))
+      expect(metadata).to.be.an('array')
+      metadata[0]
+        .callable(req())
+        .then((data: any) => {
+          expect(data).to.be.an('object')
+          expect(data.test).to.be.a('string')
+          expect(data.test).to.equal(bodyObject.test)
+          expect(data.test2).to.equal(bodyObject.test2)
+        })
+        .then(done)
     })
 
-    it('@Body(`test`) => Should return value for key `test`', () => {
-      expect(hmd('hasBodyKeyAsArgument', controller)).to.be.true
+    it('@Body(undefined, YAML.parse) =>  Should add a @Body argument containing the entire body object', done => {
+      const metadata = gmd('hasYamlBodyAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      metadata[0]
+        .callable(reqYaml())
+        .then((data: any) => {
+          expect(data).to.be.an('object')
+          expect(data.test).to.be.a('string')
+          expect(data.test).to.equal(bodyObject.test)
+          expect(data.test2).to.equal(bodyObject.test2)
+        })
+        .then(done)
+    })
+
+    it('@Body(`test`) => Should add a @Body argument containing the value for `test` key', done => {
+      const metadata = gmd('hasBodyKeyAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      metadata[0]
+        .callable(req())
+        .then((data: string) => {
+          expect(data).to.be.a('string')
+          expect(data).to.equal(bodyObject.test)
+        })
+        .then(done)
+    })
+
+    it('@Body(`test`, YAML.parse) => Should add a @Body argument containing the value for `test` key', done => {
+      const metadata = gmd('hasYamlBodyKeyAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      metadata[0]
+        .callable(reqYaml())
+        .then((data: string) => {
+          expect(data).to.be.a('string')
+          expect(data).to.equal(bodyObject.test)
+        })
+        .then(done)
     })
   })
 

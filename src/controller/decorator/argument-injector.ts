@@ -2,14 +2,7 @@ import {ParsedUrlQuery} from 'querystring'
 import SetCookieParser from 'set-cookie-parser'
 import {parse} from 'url'
 
-import {
-  Request,
-  RequestAndResponse,
-  RequestBodyDecoder,
-  RequestHeader,
-  RequestMethod,
-  Response,
-} from '../../http/_types'
+import {Request, RequestAndResponse, RequestBodyDecoder, RequestHeader, Response} from '../../http/_types'
 
 import {ArgumentMapperCallable, ArgumentSource} from './_types'
 
@@ -27,14 +20,16 @@ import {ArgumentMapperCallable, ArgumentSource} from './_types'
  */
 export const Body = (key?: string, decoder: RequestBodyDecoder = JSON.parse): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
+    const mapper = (data: any) => (key ? data[key] : data)
+
     appendParameterMapper(
       target,
       methodKey,
       parameterIndex,
-      async (req: Request): Promise<any> => {
-        const bodyData: ParsedUrlQuery = decoder(await readRequestBody(req))
-        return key ? bodyData[key] : bodyData
-      },
+      (req: Request): Promise<any> =>
+        readRequestBody(req)
+          .then(decoder)
+          .then(mapper),
     )
   }
 }
