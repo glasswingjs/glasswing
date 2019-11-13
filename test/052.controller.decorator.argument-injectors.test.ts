@@ -27,10 +27,20 @@ const hmd = (key: string, target: any) => Reflect.hasMetadata(methodArgumentsDes
 const gmd = (key: string, target: any) => Reflect.getMetadata(methodArgumentsDescriptor(key), target)
 
 const req = (): Request => {
-  return new MockRequest({}, JSON.stringify(bodyObject))
+  return new MockRequest({
+    headers: {
+      'cookie': ''
+    },
+    method: 'GET',
+    url: '/test?test=testValue&test2=testValue2',
+  }, JSON.stringify(bodyObject))
 }
 
-const reqYaml = (): Request => new MockRequest({}, YAML.stringify(bodyObject))
+const reqYaml = (): Request => new MockRequest({
+  headers: {},
+  method: 'GET',
+  url: '/test?test=testValue&test2=testValue2',
+}, YAML.stringify(bodyObject))
 
 describe('lib/controller/decorator/argument-injector => *', () => {
   describe('Body(key:? string, decoder?: RequestBodyDecoder) => ', () => {
