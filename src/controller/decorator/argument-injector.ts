@@ -119,9 +119,13 @@ export const Ip = (): ParameterDecorator => {
  */
 export const Param = (key?: string): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
-    appendParameterMapper(target, methodKey, parameterIndex, (params: object): any => {
-      return key ? (params as any)[key] : params
-    })
+    appendParameterMapper(
+      target,
+      methodKey,
+      parameterIndex,
+      (params: object): any => (key ? (params as any)[key] : params),
+      'params',
+    )
   }
 }
 

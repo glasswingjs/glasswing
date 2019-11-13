@@ -2,9 +2,9 @@ import {IncomingHttpHeaders, IncomingMessage} from 'http'
 import {Socket} from 'net'
 
 export interface MockRequestOptions {
-  headers: IncomingHttpHeaders;
-  method?: string;
-  url?: string;
+  headers: IncomingHttpHeaders
+  method?: string
+  url?: string
 }
 
 export class MockRequest extends IncomingMessage {

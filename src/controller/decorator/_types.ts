@@ -1,4 +1,4 @@
-export type ArgumentSource = 'request' | 'response' | 'request+response' | 'router'
+export type ArgumentSource = 'request' | 'response' | 'request+response' | 'params'
 
 export type ArgumentMapperCallable = (entity: any) => any
 
