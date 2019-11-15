@@ -5,7 +5,7 @@ import {container} from 'tsyringe'
 import YAML from 'yaml'
 
 import {MockRequest} from './mock'
-import {Body, methodArgumentsDescriptor, Param, Request} from '../src'
+import {Body, methodArgumentsDescriptor, Param, Query, Request} from '../src'
 
 const bodyObject = {
   test: 'testValue',
@@ -24,6 +24,10 @@ class TestController {
   hasParamAsArgument(@Param() params: any) {}
 
   hasParamKeyAsArgument(@Param('test') param: any) {}
+
+  hasQueryAsArgument(@Query() params: any) {}
+
+  hasQueryKeyAsArgument(@Query('test') param: any) {}
 }
 
 const hmd = (key: string, target: any) => Reflect.hasMetadata(methodArgumentsDescriptor(key), target)
@@ -171,7 +175,7 @@ describe('lib/controller/decorator/argument-injector => *', () => {
       expect(data.test2).to.equal(bodyObject.test2)
     })
 
-    it('@Param(`test`) => Should add a @Param argument containing the value for `test` key', () => {
+    it('@Param(`test`) => Should add a @Param argument containing the value for `test` key from the `params` object', () => {
       const metadata = gmd('hasParamKeyAsArgument', controller)
       expect(metadata).to.be.an('array')
       const data = metadata[0].callable(bodyObject)
@@ -180,11 +184,39 @@ describe('lib/controller/decorator/argument-injector => *', () => {
     })
   })
 
-  // describe('Query(key:? string) => ', () => {
-  //   it('@Query() => Should return return an object (even if query is empty)', () => {})
+  describe('Query(key:? string) => ', () => {
+    let controller: TestController
 
-  //   it('@Query(`test`) => Should return value for key `test`', () => {})
-  // })
+    beforeEach(() => {
+      controller = new TestController()
+    })
+
+    it('@Query() => Should add a @Query argument descriptor with `query` source', () => {
+      expect(hmd('hasQueryAsArgument', controller)).to.be.true
+      const metadata = gmd('hasQueryAsArgument', controller)
+      expect(metadata.length).to.equal(1)
+      expect(metadata[0].source).to.be.a('string')
+      expect(metadata[0].source).to.equal('request')
+    })
+
+    it('@Query() => Should add a @Query argument containing the entire `query` object', () => {
+      const metadata = gmd('hasQueryAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      const data = metadata[0].callable(req())
+      expect(data).to.be.an('object')
+      expect(data.test).to.be.a('string')
+      expect(data.test).to.equal(bodyObject.test)
+      expect(data.test2).to.equal(bodyObject.test2)
+    })
+
+    it('@Query(`test`) => Should add a @Query argument containing the value for `test` key from the `query` object', () => {
+      const metadata = gmd('hasQueryKeyAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      const data = metadata[0].callable(req())
+      expect(data).to.be.a('string')
+      expect(data).to.equal(bodyObject.test)
+    })
+  })
 
   // describe('Req() => ', () => {
   //   it('@Req() => Should return return an object', () => {})
