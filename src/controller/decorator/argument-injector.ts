@@ -39,7 +39,6 @@ export const Body = (key?: string, decoder: RequestBodyDecoder = JSON.parse): Pa
  * If key is not mentioned or `null`, will return the entire cookies object.
  * If key is mentioned and not null, will return a certain property of the cookies object, defined by the key's
  * value.
- * If value is mentioned, it will set a new cookie based on key and value.
  *
  * TODO: Should add expires and domain parameters.
  */
@@ -49,51 +48,44 @@ export const Cookie = (key?: string, value?: any): ParameterDecorator => {
       target,
       methodKey,
       parameterIndex,
-      (entity: RequestAndResponse) => {
-        if (value === undefined) {
-          const cookiesString: string = (entity.request.headers || {}).cookie || ''
-          // const cookiesArray: any[] = cookiesString
-          //   .split(';')
-          //   .map((cookie: string) => {
-          //     var parts: string[] = cookie.split('=');
-          //     return { [(parts.shift()||'').trim()]: decodeURI(parts.join('=')), }
-          //   })
-          // const cookies: any = Object.assign({}, ...cookiesArray)
-          const cookies: any = SetCookieParser.parse(cookiesString)
-          return key ? cookies[key] : cookies
-        }
-        if (!key) {
-          throw new Error() // TODO:
-        }
-        entity.response.writeHead(200, {
-          [RequestHeader.SET_COOKIE]: `${key}=${value}`,
-          [RequestHeader.CONTENT_TYPE]: 'text/plain',
+      (req: Request) => {
+        const cookiesString: string = (req.headers || {}).cookie || ''
+        // const cookiesArray: any[] = cookiesString
+        //   .split(';')
+        //   .map((cookie: string) => {
+        //     var parts: string[] = cookie.split('=');
+        //     return { [(parts.shift()||'').trim()]: decodeURI(parts.join('=')), }
+        //   })
+        // const cookies: any = Object.assign({}, ...cookiesArray)
+        const cookies: any = SetCookieParser.parse(cookiesString.split('; '), {
+          decodeValues: true,
+          map: true,
         })
+        // console.log(cookies)
+        return key ? cookies[key] : cookies
       },
-      'request+response',
+      'request',
     )
   }
 }
 
 /**
- * Header(key?: string, value?: any)
+ * Header(key?: string)
  * If key is not mentioned or `null`, will return the entire headers object.
  * If key is mentioned and not null, will return a certain property of the headers object, defined by the key's
  * value.
- * If value is mentioned, it will set the specified value to the key.
  */
-export const Header = (key?: string, value?: any): ParameterDecorator => {
+export const Header = (key?: string): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
-    appendParameterMapper(target, methodKey, parameterIndex, (entity: RequestAndResponse) => {
-      if (value === undefined) {
+    appendParameterMapper(
+      target,
+      methodKey,
+      parameterIndex,
+      (entity: RequestAndResponse) => {
         return key ? entity.request.headers[key] : entity.request.headers
-      }
-      if (!key) {
-        throw new Error() // TODO:
-      }
-      entity.response.setHeader(key, value)
-      return value
-    })
+      },
+      'request+response',
+    )
   }
 }
 
@@ -106,7 +98,7 @@ export const Ip = (): ParameterDecorator => {
       target,
       methodKey,
       parameterIndex,
-      (req: Request): any => req.headers[RequestHeader.X_FORWARDED_FOR],
+      (req: Request): any => req.headers[RequestHeader.X_FORWARDED_FOR.toLowerCase()],
     )
   }
 }

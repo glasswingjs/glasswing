@@ -2,6 +2,11 @@ import {IncomingHttpHeaders, IncomingMessage} from 'http'
 import {Socket} from 'net'
 
 export interface MockRequestOptions {
+  httpVersion: string
+  httpVersionMajor: number
+  httpVersionMinor: number
+  complete: boolean
+  connection: Socket
   headers: IncomingHttpHeaders
   method?: string
   url?: string

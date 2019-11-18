@@ -1,11 +1,25 @@
 import 'reflect-metadata'
 import {expect} from 'chai'
 import {IncomingMessage} from 'http'
+import {Socket} from 'net'
 import {container} from 'tsyringe'
 import YAML from 'yaml'
 
-import {MockRequest} from './mock'
-import {Body, methodArgumentsDescriptor, Param, Query, Request} from '../src'
+import {MockRequest, MockResponse} from './mock'
+import {
+  Body,
+  Cookie,
+  Header,
+  Ip,
+  methodArgumentsDescriptor,
+  Param,
+  Query,
+  Req,
+  Request,
+  RequestHeader,
+  Res,
+  Response,
+} from '../src'
 
 const bodyObject = {
   test: 'testValue',
@@ -21,6 +35,16 @@ class TestController {
 
   hasYamlBodyKeyAsArgument(@Body('test', YAML.parse) body: any) {}
 
+  hasCookieAsArgument(@Cookie() params: any) {}
+
+  hasCookieKeyAsArgument(@Cookie('test') param: any) {}
+
+  hasHeaderAsArgument(@Header() params: any) {}
+
+  hasHeaderKeyAsArgument(@Header('test') param: any) {}
+
+  hasIpAsArgument(@Ip() param: string) {}
+
   hasParamAsArgument(@Param() params: any) {}
 
   hasParamKeyAsArgument(@Param('test') param: any) {}
@@ -28,28 +52,46 @@ class TestController {
   hasQueryAsArgument(@Query() params: any) {}
 
   hasQueryKeyAsArgument(@Query('test') param: any) {}
+
+  hasReqAsArgument(@Req() param: any) {}
+
+  hasResAsArgument(@Res() param: any) {}
 }
 
 const hmd = (key: string, target: any) => Reflect.hasMetadata(methodArgumentsDescriptor(key), target)
 
 const gmd = (key: string, target: any) => Reflect.getMetadata(methodArgumentsDescriptor(key), target)
 
-const req = (): Request => {
-  return new MockRequest(
+const req = (): Request =>
+  new MockRequest(
     {
+      httpVersion: '1.1',
+      httpVersionMajor: 1,
+      httpVersionMinor: 1,
+      complete: true,
+      connection: new Socket(),
       headers: {
-        cookie: '',
+        [RequestHeader.COOKIE.toLowerCase()]: 'test=testValue; test2=testValue2',
+        [RequestHeader.X_FORWARDED_FOR.toLowerCase()]: '8.8.8.8',
+        test: 'testValue',
+        test2: 'testValue2',
       },
       method: 'GET',
       url: '/test?test=testValue&test2=testValue2',
     },
     JSON.stringify(bodyObject),
   )
-}
+
+const res = (): Response => new MockResponse(req() as IncomingMessage)
 
 const reqYaml = (): Request =>
   new MockRequest(
     {
+      httpVersion: '1.1',
+      httpVersionMajor: 1,
+      httpVersionMinor: 1,
+      complete: true,
+      connection: new Socket(),
       headers: {},
       method: 'GET',
       url: '/test?test=testValue&test2=testValue2',
@@ -126,29 +168,98 @@ describe('lib/controller/decorator/argument-injector => *', () => {
     })
   })
 
-  // describe('Cookie(key:? string, value?: string) => ', () => {
-  //   it('@Cookie() => Should return return an object (even if cookies is empty)', () => {})
+  describe('Cookie(key:? string) => ', () => {
+    let controller: TestController
 
-  //   it('@Cookie(`test`) => Should return value for key `test`', () => {})
+    beforeEach(() => {
+      controller = new TestController()
+    })
 
-  //   it('@Cookie(`test`, `test`) => Should set value `test` for key `test`', () => {})
+    it('@Cookie() => Should add a @Cookie argument descriptor with `request` source', () => {
+      expect(hmd('hasCookieAsArgument', controller)).to.be.true
+      const metadata = gmd('hasCookieAsArgument', controller)
+      expect(metadata.length).to.equal(1)
+      expect(metadata[0].source).to.be.a('string')
+      expect(metadata[0].source).to.equal('request')
+    })
 
-  //   it('@Cookie(undefined, `test`) => Should throw an error', () => {})
-  // })
+    it('@Cookie() => Should add a @Cookie argument containing the entire `request` object', () => {
+      const metadata = gmd('hasCookieAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      const data = metadata[0].callable(req())
+      console.log(data)
+      expect(data).to.be.an('object')
+      expect(data.test).to.be.a('string')
+      expect(data.test).to.equal(bodyObject.test)
+      expect(data.test2).to.equal(bodyObject.test2)
+    })
 
-  // describe('Header(key:? string, value?: string) => ', () => {
-  //   it('@Header() => Should return return an object (even if headers is empty)', () => {})
+    it('@Cookie(`test`) => Should add a @Cookie argument containing the value for `test` key from the `request` object', () => {
+      const metadata = gmd('hasCookieKeyAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      const data = metadata[0].callable(req())
+      expect(data).to.be.a('string')
+      expect(data).to.equal(bodyObject.test)
+    })
+  })
 
-  //   it('@Header(`test`) => Should return value for key `test`', () => {})
+  describe('Header(key:? string, value?: string) => ', () => {
+    let controller: TestController
 
-  //   it('@Header(`test`, `test`) => Should set value `test` for key `test`', () => {})
+    beforeEach(() => {
+      controller = new TestController()
+    })
 
-  //   it('@Header(undefined, `test`) => Should throw an error', () => {})
-  // })
+    it('@Header() => Should add a @Header argument descriptor with `request+response` source', () => {
+      expect(hmd('hasHeaderAsArgument', controller)).to.be.true
+      const metadata = gmd('hasHeaderAsArgument', controller)
+      expect(metadata.length).to.equal(1)
+      expect(metadata[0].source).to.be.a('string')
+      expect(metadata[0].source).to.equal('request+response')
+    })
 
-  // describe('Ip() => ', () => {
-  //   it('@Header() => Should return return an string', () => {})
-  // })
+    it('@Header() => Should add a @Header argument containing the entire `request` object', () => {
+      const metadata = gmd('hasHeaderAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      const data = metadata[0].callable({request: req(), response: res()})
+      expect(data).to.be.an('object')
+      expect(data.test).to.be.a('string')
+      expect(data.test).to.equal(bodyObject.test)
+      expect(data.test2).to.equal(bodyObject.test2)
+    })
+
+    it('@Header(`test`) => Should add a @Header argument containing the value for `test` key from the `request` object', () => {
+      const metadata = gmd('hasHeaderKeyAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      const data = metadata[0].callable({request: req(), response: res()})
+      expect(data).to.be.a('string')
+      expect(data).to.equal(bodyObject.test)
+    })
+  })
+
+  describe('Ip() => ', () => {
+    let controller: TestController
+
+    beforeEach(() => {
+      controller = new TestController()
+    })
+
+    it('@Ip() => Should add a @Ip argument descriptor', () => {
+      expect(hmd('hasIpAsArgument', controller)).to.be.true
+      const metadata = gmd('hasIpAsArgument', controller)
+      expect(metadata.length).to.equal(1)
+      expect(metadata[0].source).to.be.a('string')
+      expect(metadata[0].source).to.equal('request')
+    })
+
+    it('@Ip() => Should add a @Ip argument', () => {
+      const metadata = gmd('hasIpAsArgument', controller)
+      expect(metadata).to.be.an('array')
+      const data = metadata[0].callable(req())
+      expect(data).to.be.a('string')
+      expect(data).to.equal('8.8.8.8')
+    })
+  })
 
   describe('Param(key:? string) => ', () => {
     let controller: TestController
@@ -218,11 +329,35 @@ describe('lib/controller/decorator/argument-injector => *', () => {
     })
   })
 
-  // describe('Req() => ', () => {
-  //   it('@Req() => Should return return an object', () => {})
-  // })
+  describe('Req() => ', () => {
+    let controller: TestController
 
-  // describe('Res() => ', () => {
-  //   it('@Res() => Should return return an object', () => {})
-  // })
+    beforeEach(() => {
+      controller = new TestController()
+    })
+
+    it('@Req() => Should add a @Req argument descriptor', () => {
+      expect(hmd('hasReqAsArgument', controller)).to.be.true
+      const metadata = gmd('hasReqAsArgument', controller)
+      expect(metadata.length).to.equal(1)
+      expect(metadata[0].source).to.be.a('string')
+      expect(metadata[0].source).to.equal('request')
+    })
+  })
+
+  describe('Res() => ', () => {
+    let controller: TestController
+
+    beforeEach(() => {
+      controller = new TestController()
+    })
+
+    it('@Res() => Should add a @Res argument descriptor', () => {
+      expect(hmd('hasResAsArgument', controller)).to.be.true
+      const metadata = gmd('hasResAsArgument', controller)
+      expect(metadata.length).to.equal(1)
+      expect(metadata[0].source).to.be.a('string')
+      expect(metadata[0].source).to.equal('response')
+    })
+  })
 })
