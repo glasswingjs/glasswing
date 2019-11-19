@@ -5,12 +5,14 @@ export type Request = IncomingMessage | Http2ServerRequest
 
 export type Response = ServerResponse | Http2ServerResponse
 
+// export {Cookie as Cookie} from '@types/set-cookie-parser'
+
 export interface RequestAndResponse {
   request: Request
   response: Response
 }
 
-export type RequestHandler = (req: Request, res: Response) => void
+export type RequestHandler = (req: Request, res: Response, params: any) => void
 
 export type RequestBodyDecoder = (val: string) => any
 

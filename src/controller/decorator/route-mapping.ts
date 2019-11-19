@@ -1,15 +1,16 @@
 import {Request, RequestHandler, RequestMethod, Response} from '../../http'
 import {RouteRegistry} from '../../route'
 
+import {methodArgumentsDescriptor} from './argument-injector'
+import {Controller} from './controller'
+
+export const ROUTE_REGISTRY_METADATA_NAME = '__route_registry__'
+
 /**
  * @link https://nehalist.io/routing-with-typescript-decorators/#routedecorator
  */
 
 export type XFunction = (...args: any[]) => any
-
-const mapHandlerArguments = (req: Request, res: Response, params: any[], metadata: any[]): any[] => {
-  return []
-}
 
 /**
  *
@@ -22,31 +23,27 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
    */
   const decorator = (path?: string | string[]): MethodDecorator => {
     return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
-      const routeRegistry: RouteRegistry = Reflect.hasMetadata('routeRegistry', target.constructor)
-        ? (Reflect.getMetadata('routeRegistry', target.constructor) as RouteRegistry)
-        : new RouteRegistry()
+      // store old method to call from wrapper
+      const oldMethod = descriptor.value
 
-      // const metadata = Reflect.getMetadata(methodArgumentsDescriptor(propertyKey), target) as any[]
-      // console.log(methodArgumentsDescriptor(propertyKey), metadata, target)
+      // TODO: calculate old method's arguments
+      // const argsDefinitions: any[] = mapHandlerArguments(req, res, params, Reflect.getMetadata(
+      //   methodArgumentsDescriptor(propertyKey),
+      //   target,
+      // ) as any[])
+      // console.log(argsDefinitions)
 
       /**
        *
        * @param {Request} req
        * @param {Response} res
-       * @param {NextFunction} next
+       * @param {any[]} params
        */
-      const handler: RequestHandler = (req: Request, res: Response /*, params: any[]*/) => {
-        // const args: any[] = mapHandlerArguments(req, res, params, Reflect.getMetadata(
-        //   methodArgumentsDescriptor(propertyKey),
-        //   target,
-        // ) as any[])
+      const handler: RequestHandler = (req: Request, res: Response, params: any) => {
+        return oldMethod.apply(target, [])
       }
 
-      path = Array.isArray(path) ? path : [path || '/']
-
-      path.forEach(p => routeRegistry.registerRoute(p, method, handler))
-
-      Reflect.defineMetadata('routeRegistry', routeRegistry, target)
+      appendControllerPathMapping(target, method, Array.isArray(path) ? path : [path || '/'], handler)
 
       return Object.assign(descriptor, {
         value: handler,
@@ -71,3 +68,44 @@ export const Patch = createRouteMappingDecorator(RequestMethod.PATCH)
 export const Post = createRouteMappingDecorator(RequestMethod.POST)
 
 export const Put = createRouteMappingDecorator(RequestMethod.PUT)
+
+/******************************************************************************
+ *
+ * Helpers
+ *
+ *****************************************************************************/
+
+/**
+ * Append a path mapping to a controller
+ *
+ * @param target
+ * @param method
+ * @param path
+ * @param handler
+ */
+export const appendControllerPathMapping = (
+  target: any,
+  method: RequestMethod,
+  path: string[],
+  handler: RequestHandler,
+) => {
+  const routeRegistry: RouteRegistry = Reflect.hasMetadata(ROUTE_REGISTRY_METADATA_NAME, target)
+    ? (Reflect.getMetadata(ROUTE_REGISTRY_METADATA_NAME, target) as RouteRegistry)
+    : new RouteRegistry()
+
+  path.forEach(p => routeRegistry.registerRoute(p, method, handler))
+
+  Reflect.defineMetadata(ROUTE_REGISTRY_METADATA_NAME, routeRegistry, target)
+}
+
+/**
+ * Obtain controller's path mappings
+ *
+ * @param target
+ */
+export const getControllerPathMappings = (target: any): RouteRegistry => {
+  if (!Reflect.hasMetadata(ROUTE_REGISTRY_METADATA_NAME, target)) {
+    // TODO: Throw an eror
+  }
+  return Reflect.getMetadata(ROUTE_REGISTRY_METADATA_NAME, target)
+}

@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import {expect} from 'chai'
 import {container} from 'tsyringe'
 
-import {HelloWorldController, Route, RouteRegistry, RequestMethod} from '../src'
+import {getControllerPathMappings, HelloWorldController, Route, RouteRegistry, RequestMethod} from '../src'
 
 describe('lib/controller/decorators => @Controller', () => {
   let controller: any
@@ -14,9 +14,8 @@ describe('lib/controller/decorators => @Controller', () => {
   })
 
   it('Controller::constructor() routeRegistry metadata to be a RouteRegistry instance', () => {
-    expect(Reflect.hasMetadata('routeRegistry', controller)).to.be.true
-    expect(Reflect.getMetadata('routeRegistry', controller)).to.be.an('object')
-    expect(Reflect.getMetadata('routeRegistry', controller) instanceof RouteRegistry).to.be.true
+    expect(getControllerPathMappings(controller)).to.be.an('object')
+    expect(getControllerPathMappings(controller) instanceof RouteRegistry).to.be.true
   })
 
   it('Controller::inject() will return an object', () => {
@@ -26,13 +25,12 @@ describe('lib/controller/decorators => @Controller', () => {
 
   it('Controller::inject() routeRegistry metadata to be a RouteRegistry instance', () => {
     const anotherController = container.resolve(HelloWorldController)
-    expect(Reflect.hasMetadata('routeRegistry', anotherController)).to.be.true
-    expect(Reflect.getMetadata('routeRegistry', anotherController)).to.be.an('object')
-    expect(Reflect.getMetadata('routeRegistry', anotherController) instanceof RouteRegistry).to.be.true
+    expect(getControllerPathMappings(anotherController)).to.be.an('object')
+    expect(getControllerPathMappings(anotherController) instanceof RouteRegistry).to.be.true
   })
 
   it('Controller routeRegistry will contain /hello-world route', () => {
-    const routeRegistry: RouteRegistry = Reflect.getMetadata('routeRegistry', controller) as RouteRegistry
+    const routeRegistry: RouteRegistry = getControllerPathMappings(controller) as RouteRegistry
     const route: Route = routeRegistry.routes.find(
       r => r.method === RequestMethod.GET && r.path === '/hello-world',
     ) as Route

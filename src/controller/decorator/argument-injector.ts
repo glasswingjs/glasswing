@@ -39,8 +39,6 @@ export const Body = (key?: string, decoder: RequestBodyDecoder = JSON.parse): Pa
  * If key is not mentioned or `null`, will return the entire cookies object.
  * If key is mentioned and not null, will return a certain property of the cookies object, defined by the key's
  * value.
- *
- * TODO: Should add expires and domain parameters.
  */
 export const Cookie = (key?: string, value?: any): ParameterDecorator => {
   return (target: any, methodKey: string | symbol, parameterIndex: number) => {
@@ -61,7 +59,6 @@ export const Cookie = (key?: string, value?: any): ParameterDecorator => {
           decodeValues: true,
           map: true,
         })
-        // console.log(cookies)
         return key ? cookies[key] : cookies
       },
       'request',
@@ -84,7 +81,7 @@ export const Header = (key?: string): ParameterDecorator => {
       (entity: RequestAndResponse) => {
         return key ? entity.request.headers[key] : entity.request.headers
       },
-      'request+response',
+      'request',
     )
   }
 }

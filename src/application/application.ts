@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import {AbstractController} from '../controller'
+import {AbstractController, getControllerPathMappings} from '../controller'
 import {Inject, Injectable} from '../di'
 import {Route, RouteRegistry} from '../route'
 import {Router, RouterCallable} from '../router'
@@ -24,18 +24,17 @@ export class Application {
    * Register a controller to the application
    * @param controller
    */
-  public registerController(controller: AbstractController): void {
+  public registerController(controller: any): void {
     // for now it's enough to store the routes; we'll see what future reserves
-    const crs = Reflect.getMetadata('routeRegistry', controller) as RouteRegistry
-    crs.routes.forEach((route: Route) => this.routeRegistry.registerRoute(route))
+    getControllerPathMappings(controller).routes.forEach((route: Route) => this.routeRegistry.registerRoute(route))
   }
 
   /**
    * Register a set of controllers to the application
    * @param controllers
    */
-  public registerControllers(controllers: AbstractController[]): void {
-    controllers.forEach((controller: AbstractController) => this.registerController(controller))
+  public registerControllers(controllers: any[]): void {
+    controllers.forEach((controller: any) => this.registerController(controller))
   }
 
   /**
