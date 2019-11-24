@@ -2,7 +2,7 @@ import {ParsedUrlQuery} from 'querystring'
 import SetCookieParser from 'set-cookie-parser'
 import {parse} from 'url'
 
-import {Request, RequestAndResponse, RequestBodyDecoder, RequestHeader, Response} from '../../http/_types'
+import {Request, RequestBodyDecoder, RequestHeader, Response} from '../../http/_types'
 
 import {ArgumentMapperCallable, ArgumentSource} from './_types'
 
@@ -78,8 +78,8 @@ export const Header = (key?: string): ParameterDecorator => {
       target,
       methodKey,
       parameterIndex,
-      (entity: RequestAndResponse) => {
-        return key ? entity.request.headers[key] : entity.request.headers
+      (req: Request) => {
+        return key ? req.headers[key] : req.headers
       },
       'request',
     )

@@ -221,7 +221,7 @@ describe('lib/controller/decorator/argument-injector => *', () => {
     it('@Header() => Should add a @Header argument containing the entire `headers` object', () => {
       const metadata = gmd('hasHeaderAsArgument', controller)
       expect(metadata).to.be.an('array')
-      const data = metadata[0].callable({request: req(), response: res()})
+      const data = metadata[0].callable(req())
       expect(data).to.be.an('object')
       expect(data.test).to.be.a('string')
       expect(data.test).to.equal(bodyObject.test)
@@ -231,7 +231,7 @@ describe('lib/controller/decorator/argument-injector => *', () => {
     it('@Header(`test`) => Should add a @Header argument containing the value for `test` key from the `headers` object', () => {
       const metadata = gmd('hasHeaderKeyAsArgument', controller)
       expect(metadata).to.be.an('array')
-      const data = metadata[0].callable({request: req(), response: res()})
+      const data = metadata[0].callable(req())
       expect(data).to.be.a('string')
       expect(data).to.equal(bodyObject.test)
     })
