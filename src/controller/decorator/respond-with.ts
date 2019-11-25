@@ -16,13 +16,18 @@ export const RespondWith = (bodyEncoder: ResponseBodyEncoder = data => data, ...
   const handler = (oldMethod: ControllerAction) => {
     return (...args: any[]) =>
       isAsync(oldMethod)
-        ? oldMethod(...args).then(result => bodyEncoder(result, ...other))
+        ? oldMethod(...args).then((result: any) => bodyEncoder(result, ...other))
         : bodyEncoder(oldMethod(...args), ...other)
   }
   return wrapPropertyDescriptorHandler(descriptor, handler)
 }
 
-const RespondWithRaw =(...args: any[]): MethodDecorator => RespondWith((data: any) => data, ...args)
+/**
+ * Wrap controller respond with raw data
+ *
+ * @param args
+ */
+export const RespondWithRaw =(...args: any[]): MethodDecorator => RespondWith((data: any) => data, ...args)
 
 /**
  * Wrap controller action to encode response into a JSON string
