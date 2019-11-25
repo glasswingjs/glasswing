@@ -1,16 +1,13 @@
 import {Request, RequestHandler, RequestMethod, Response} from '../../http'
 import {RouteRegistry} from '../../route'
-
+import {ParameterDescriptor} from './_types'
 import {methodArgumentsDescriptor} from './argument-injector'
-import {Controller} from './controller'
 
 export const ROUTE_REGISTRY_METADATA_NAME = '__route_registry__'
 
 /**
  * @link https://nehalist.io/routing-with-typescript-decorators/#routedecorator
  */
-
-export type XFunction = (...args: any[]) => any
 
 /**
  *
@@ -26,13 +23,6 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
       // store old method to call from wrapper
       const oldMethod = descriptor.value
 
-      // TODO: calculate old method's arguments
-      // const argsDefinitions: any[] = mapHandlerArguments(req, res, params, Reflect.getMetadata(
-      //   methodArgumentsDescriptor(propertyKey),
-      //   target,
-      // ) as any[])
-      // console.log(argsDefinitions)
-
       /**
        *
        * @param {Request} req
@@ -40,7 +30,13 @@ const createRouteMappingDecorator = (method: RequestMethod) => {
        * @param {any[]} params
        */
       const handler: RequestHandler = (req: Request, res: Response, params: any) => {
-        return oldMethod.apply(target, [])
+        // // calculate old method's arguments
+        // const argsDefinitions: any[] = await mapHandlerArguments(req, res, params, Reflect.getMetadata(
+        //   methodArgumentsDescriptor(propertyKey),
+        //   target,
+        // ) as ParameterDescriptor[])
+        // // return old method call
+        // return oldMethod.apply(target, argsDefinitions)
       }
 
       appendControllerPathMapping(target, method, Array.isArray(path) ? path : [path || '/'], handler)
@@ -108,4 +104,33 @@ export const getControllerPathMappings = (target: any): RouteRegistry => {
     // TODO: Throw an eror
   }
   return Reflect.getMetadata(ROUTE_REGISTRY_METADATA_NAME, target)
+}
+
+/**
+ * Convert parameter descriptors into actual values to be passed to the method
+ *
+ * @param req
+ * @param res
+ * @param params
+ * @param descriptors
+ */
+const mapHandlerArguments = async (
+  req: Request,
+  res: Response,
+  params: object,
+  descriptors: ParameterDescriptor[],
+): Promise<any[]> => {
+  return await Promise.all(
+    (descriptors || []).map((descriptor: ParameterDescriptor): any | Promise<any> => {
+      const data: any =
+        descriptor.source === 'request'
+          ? req
+          : descriptor.source === 'response'
+          ? res
+          : descriptor.source === 'params'
+          ? params
+          : null
+      return descriptor.callable(data)
+    }),
+  )
 }

@@ -11,6 +11,8 @@ export type RequestHandler = (req: Request, res: Response, params: any) => void
 
 export type RequestBodyDecoder = (val: string) => any
 
+export type ResponseBodyEncoder = (val: any, ...args: any[]) => any
+
 /**
  * List of HTTP headers, as described on MDN Documentation
  * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers

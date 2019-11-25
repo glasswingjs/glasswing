@@ -4,7 +4,7 @@ import {parse} from 'url'
 
 import {Request, RequestBodyDecoder, RequestHeader, Response} from '../../http/_types'
 
-import {ArgumentMapperCallable, ArgumentSource} from './_types'
+import {ArgumentMapperCallable, ArgumentSource, ParameterDescriptor} from './_types'
 
 /******************************************************************************
  *
@@ -199,20 +199,27 @@ const appendParameterMapper = (
   callable: ArgumentMapperCallable,
   source: ArgumentSource = 'request',
 ): void => {
+  // calculate method (name) descriptor
   const methodDescriptor: string = methodArgumentsDescriptor(methodName)
 
+  // can't set ParameterDescriptor[] type due to creation of an array of zeros
   const metadata: any[] = Array(parameterIndex + 1)
 
+  // copy already discovered parameters into the new array
   if (Reflect.hasMetadata(methodDescriptor, target)) {
-    const oldMetadata = Reflect.getMetadata(methodDescriptor, target) as any[]
+    const oldMetadata: ParameterDescriptor[] =
+      (Reflect.getMetadata(methodDescriptor, target) as ParameterDescriptor[]) || []
     oldMetadata.forEach((data, index) => {
       metadata[index] = data
     })
   }
 
+  // add the new discovered parameter descriptor to the array
   metadata[parameterIndex] = {
     callable,
     source,
   }
+
+  // set the data back
   Reflect.defineMetadata(methodDescriptor, metadata, target)
 }

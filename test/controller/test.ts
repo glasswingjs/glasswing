@@ -1,4 +1,4 @@
-import {Controller, All, Delete, Get, Head, Options, Param, Patch, Post, Put} from '../../src'
+import {Controller, All, Body, Delete, Get, Head, Options, Param, Patch, Post, Put, Req, Request} from '../../src'
 
 @Controller()
 export class TestController {
@@ -17,7 +17,10 @@ export class TestController {
     return 'noArgsGet'
   }
 
-  // public withArgsGet(@Req()): string {}
+  @Get('/with-req-get')
+  public withReqGet(@Req() req: Request): string {
+    return req.url || ''
+  }
 
   @Head('/head')
   public head(): string {
@@ -37,6 +40,11 @@ export class TestController {
   @Post('/no-args-post')
   public noArgsPost(): string {
     return 'noArgsPost'
+  }
+
+  @Post('/with-args-post')
+  public withArgsPost(@Body('test') test: string, @Body('test2') test2: string): string {
+    return `post ${test} ${test2}`
   }
 
   @Put('/no-args-put')

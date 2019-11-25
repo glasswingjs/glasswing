@@ -1,5 +1,6 @@
 import {IncomingHttpHeaders, IncomingMessage} from 'http'
 import {Socket} from 'net'
+import YAML from 'yaml'
 
 import {Request, RequestHeader} from '../../src'
 
@@ -52,4 +53,24 @@ export const req = (): Request =>
       url: '/test?test=testValue&test2=testValue2',
     },
     JSON.stringify(bodyObject),
+  )
+
+export const reqYaml = (): Request =>
+  new MockRequest(
+    {
+      httpVersion: '1.1',
+      httpVersionMajor: 1,
+      httpVersionMinor: 1,
+      complete: true,
+      connection: new Socket(),
+      headers: {
+        [RequestHeader.COOKIE.toLowerCase()]: 'test=testValue; test2=testValue2',
+        [RequestHeader.X_FORWARDED_FOR.toLowerCase()]: '8.8.8.8',
+        test: 'testValue',
+        test2: 'testValue2',
+      },
+      method: 'GET',
+      url: '/test?test=testValue&test2=testValue2',
+    },
+    YAML.stringify(bodyObject),
   )

@@ -5,7 +5,7 @@ import {Socket} from 'net'
 import {container} from 'tsyringe'
 import YAML from 'yaml'
 
-import {MockRequest, MockResponse} from './mock'
+import {bodyObject, req, reqYaml, res} from './mock'
 import {
   Body,
   Cookie,
@@ -19,12 +19,8 @@ import {
   RequestHeader,
   Res,
   Response,
+  ResponseCode,
 } from '../src'
-
-const bodyObject = {
-  test: 'testValue',
-  test2: 'testValue2',
-}
 
 class TestController {
   hasBodyAsArgument(@Body() body: any) {}
@@ -49,6 +45,8 @@ class TestController {
 
   hasParamKeyAsArgument(@Param('test') param: any) {}
 
+  has2ParamKeyAsArgument(@Param('test') param: any, @Param('test2') param2: any) {}
+
   hasQueryAsArgument(@Query() params: any) {}
 
   hasQueryKeyAsArgument(@Query('test') param: any) {}
@@ -61,43 +59,6 @@ class TestController {
 const hmd = (key: string, target: any) => Reflect.hasMetadata(methodArgumentsDescriptor(key), target)
 
 const gmd = (key: string, target: any) => Reflect.getMetadata(methodArgumentsDescriptor(key), target)
-
-const req = (): Request =>
-  new MockRequest(
-    {
-      httpVersion: '1.1',
-      httpVersionMajor: 1,
-      httpVersionMinor: 1,
-      complete: true,
-      connection: new Socket(),
-      headers: {
-        [RequestHeader.COOKIE.toLowerCase()]: 'test=testValue; test2=testValue2',
-        [RequestHeader.X_FORWARDED_FOR.toLowerCase()]: '8.8.8.8',
-        test: 'testValue',
-        test2: 'testValue2',
-      },
-      method: 'GET',
-      url: '/test?test=testValue&test2=testValue2',
-    },
-    JSON.stringify(bodyObject),
-  )
-
-const res = (): Response => new MockResponse(req() as IncomingMessage)
-
-const reqYaml = (): Request =>
-  new MockRequest(
-    {
-      httpVersion: '1.1',
-      httpVersionMajor: 1,
-      httpVersionMinor: 1,
-      complete: true,
-      connection: new Socket(),
-      headers: {},
-      method: 'GET',
-      url: '/test?test=testValue&test2=testValue2',
-    },
-    YAML.stringify(bodyObject),
-  )
 
 describe('lib/controller/decorator/argument-injector => *', () => {
   describe('Body(key:? string, decoder?: RequestBodyDecoder) => ', () => {
@@ -293,6 +254,19 @@ describe('lib/controller/decorator/argument-injector => *', () => {
       expect(data).to.be.a('string')
       expect(data).to.equal(bodyObject.test)
     })
+
+    it('@Param(`test`), @Params(`test2`) => Should add @Param argumenta containing the value for `test` and `test2` keys from the `params` object', () => {
+      const metadata = gmd('has2ParamKeyAsArgument', controller)
+      expect(metadata).to.be.an('array')
+
+      const data = metadata[0].callable(bodyObject)
+      expect(data).to.be.a('string')
+      expect(data).to.equal(bodyObject.test)
+
+      const data2 = metadata[1].callable(bodyObject)
+      expect(data2).to.be.a('string')
+      expect(data2).to.equal(bodyObject.test2)
+    })
   })
 
   describe('Query(key:? string) => ', () => {
@@ -338,10 +312,15 @@ describe('lib/controller/decorator/argument-injector => *', () => {
 
     it('@Req() => Should add a @Req argument descriptor with `request` source', () => {
       expect(hmd('hasReqAsArgument', controller)).to.be.true
+
       const metadata = gmd('hasReqAsArgument', controller)
       expect(metadata.length).to.equal(1)
       expect(metadata[0].source).to.be.a('string')
       expect(metadata[0].source).to.equal('request')
+
+      const data = metadata[0].callable(req())
+      expect(data).to.be.a('object')
+      expect(data.url).to.equal(req().url)
     })
   })
 
@@ -354,10 +333,15 @@ describe('lib/controller/decorator/argument-injector => *', () => {
 
     it('@Res() => Should add a @Res argument descriptor with `response` source', () => {
       expect(hmd('hasResAsArgument', controller)).to.be.true
+
       const metadata = gmd('hasResAsArgument', controller)
       expect(metadata.length).to.equal(1)
       expect(metadata[0].source).to.be.a('string')
       expect(metadata[0].source).to.equal('response')
+
+      const data = metadata[0].callable(res())
+      expect(data).to.be.a('object')
+      expect(data.statusCode).to.equal(ResponseCode.OK)
     })
   })
 })
