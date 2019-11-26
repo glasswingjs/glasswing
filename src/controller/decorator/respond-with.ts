@@ -1,7 +1,6 @@
+import YAML from 'yaml'
 import {ResponseBodyEncoder} from './../../http/_types'
 import {ControllerAction, isAsync, wrapPropertyDescriptorHandler} from './_utils'
-import YAML from 'yaml'
-import {encode} from 'punycode'
 
 /**
  * Comment
@@ -14,10 +13,12 @@ export const RespondWith = (bodyEncoder: ResponseBodyEncoder = data => data, ...
   descriptor: PropertyDescriptor,
 ): PropertyDescriptor => {
   const handler = (oldMethod: ControllerAction) => {
-    return (...args: any[]) =>
-      isAsync(oldMethod)
-        ? oldMethod(...args).then((result: any) => bodyEncoder(result, ...other))
-        : bodyEncoder(oldMethod(...args), ...other)
+    return (...args: any[]) => {
+      const result = oldMethod(...args)
+      return result instanceof Promise
+        ? result.then((data: any) => bodyEncoder(data, ...other))
+        : bodyEncoder(result, ...other)
+    }
   }
   return wrapPropertyDescriptorHandler(descriptor, handler)
 }
@@ -27,7 +28,7 @@ export const RespondWith = (bodyEncoder: ResponseBodyEncoder = data => data, ...
  *
  * @param args
  */
-export const RespondWithRaw =(...args: any[]): MethodDecorator => RespondWith((data: any) => data, ...args)
+export const RespondWithRaw = (...args: any[]): MethodDecorator => RespondWith((data: any) => data, ...args)
 
 /**
  * Wrap controller action to encode response into a JSON string
