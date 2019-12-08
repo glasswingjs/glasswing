@@ -4,13 +4,25 @@
 			"path": "."
 		},
 		{
-			"path": "C:/Users/dragosc/Workspace/github.com/glasswingjs/router"
+			"path": "C:\\Users\\dragosc\\Workspace\\github.com\\glasswingjs\\node_modules\\@glasswing\\application"
 		},
 		{
-			"path": "C:/Users/dragosc/Workspace/github.com/glasswingjs/http"
+			"path": "C:\\Users\\dragosc\\Workspace\\github.com\\glasswingjs\\node_modules\\@glasswing\\common"
 		},
 		{
-			"path": "C:/Users/dragosc/Workspace/github.com/glasswingjs/config"
+			"path": "C:\\Users\\dragosc\\Workspace\\github.com\\glasswingjs\\node_modules\\@glasswing\\config"
+		},
+		{
+			"path": "C:\\Users\\dragosc\\Workspace\\github.com\\glasswingjs\\node_modules\\@glasswing\\controller"
+		},
+		{
+			"path": "C:\\Users\\dragosc\\Workspace\\github.com\\glasswingjs\\node_modules\\@glasswing\\http"
+		},
+		{
+			"path": "C:\\Users\\dragosc\\Workspace\\github.com\\glasswingjs\\node_modules\\@glasswing\\router"
+		},
+		{
+			"path": "C:\\Users\\dragosc\\Workspace\\github.com\\glasswingjs\\node_modules\\@glasswing\\template"
 		}
 	],
 	"settings": {}
