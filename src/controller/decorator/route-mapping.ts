@@ -1,7 +1,6 @@
 import {Request, RequestHandler, RequestMethod, Response} from '../../http'
 import {RouteRegistry} from '../../route'
-import {ParameterDescriptor} from './_types'
-import {methodArgumentsDescriptor} from './argument-injector'
+// import {ParameterDescriptor} from './_types'
 
 export const ROUTE_REGISTRY_METADATA_NAME = '__route_registry__'
 

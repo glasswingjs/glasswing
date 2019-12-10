@@ -5,6 +5,24 @@
 		},
 		{
 			"path": "/home/dragosc/Workspace/github.com/glasswingjs/config"
+		},
+		{
+			"path": "/home/dragosc/Workspace/github.com/glasswingjs/http"
+		},
+		{
+			"path": "/home/dragosc/Workspace/github.com/glasswingjs/router"
+		},
+		{
+			"path": "/home/dragosc/Workspace/github.com/glasswingjs/common"
+		},
+		{
+			"path": "/home/dragosc/Workspace/github.com/glasswingjs/template"
+		},
+		{
+			"path": "/home/dragosc/Workspace/github.com/glasswingjs/controller"
+		},
+		{
+			"path": "/home/dragosc/Workspace/github.com/glasswingjs/application"
 		}
 	],
 	"settings": {}
