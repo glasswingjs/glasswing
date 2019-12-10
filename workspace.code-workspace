@@ -4,25 +4,25 @@
 			"path": "."
 		},
 		{
-			"path": "/home/dragosc/Workspace/github.com/glasswingjs/config"
+			"path": "./application"
 		},
 		{
-			"path": "/home/dragosc/Workspace/github.com/glasswingjs/http"
+			"path": "./common"
 		},
 		{
-			"path": "/home/dragosc/Workspace/github.com/glasswingjs/router"
+			"path": "./config"
 		},
 		{
-			"path": "/home/dragosc/Workspace/github.com/glasswingjs/common"
+			"path": "./controller"
 		},
 		{
-			"path": "/home/dragosc/Workspace/github.com/glasswingjs/template"
+			"path": "./http"
 		},
 		{
-			"path": "/home/dragosc/Workspace/github.com/glasswingjs/controller"
+			"path": "./router"
 		},
 		{
-			"path": "/home/dragosc/Workspace/github.com/glasswingjs/application"
+			"path": "./template"
 		}
 	],
 	"settings": {}
