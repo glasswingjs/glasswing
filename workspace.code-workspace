@@ -4,25 +4,25 @@
 			"path": "."
 		},
 		{
-			"path": "./application"
+			"path": "../application"
 		},
 		{
-			"path": "./common"
+			"path": "../common"
 		},
 		{
-			"path": "./config"
+			"path": "../config"
 		},
 		{
-			"path": "./controller"
+			"path": "../controller"
 		},
 		{
-			"path": "./http"
+			"path": "../http"
 		},
 		{
-			"path": "./router"
+			"path": "../router"
 		},
 		{
-			"path": "./template"
+			"path": "../template"
 		}
 	],
 	"settings": {}
