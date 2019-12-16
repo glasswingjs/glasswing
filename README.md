@@ -27,3 +27,5 @@
 -->
 
 Template for TypeScript developed Projects
+
+https://www.draw.io/#G1WmJR4Kb32tb_wnLGX11LXKsvseo2V5eZ

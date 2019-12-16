@@ -21,8 +21,31 @@ init: ## Init & Download all sub projects
 	[ -d ../template ] || git clone $(GIT_REPO)/template ../template
 	cd ../template && git pull
 
+s: s-template s-config s-common s-http s-router s-controller s-application ## Status packages
 
-b: b-application b-common b-config b-controller b-http b-router b-template ## Build packages
+s-application:
+	cd ../application && pwd && git status
+
+s-controller:
+	cd ../controller && pwd && git status
+
+s-common:
+	cd ../common && pwd && git status
+
+s-config:
+	cd ../config && pwd && git status
+
+s-http:
+	cd ../http && pwd && git status
+
+s-router:
+	cd ../router && pwd && git status
+
+s-template:
+	cd ../template && pwd && git status
+
+
+b: b-common b-config b-controller b-http b-router b-application b-template ## Build packages
 
 b-application:
 	cd ../application && npm run build
@@ -38,6 +61,9 @@ b-config:
 
 b-http:
 	cd ../http && npm run build
+
+b-router:
+	cd ../router && npm run build
 
 b-template:
 	cd ../template && npm run build
