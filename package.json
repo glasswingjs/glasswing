@@ -59,7 +59,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "finalhandler": "^1.1.2",
-    "find-my-way": "^2.2.1",
+    "find-my-way": "^2.2.5",
     "set-cookie-parser": "^2.4.0"
   },
   "gitHooks": {
